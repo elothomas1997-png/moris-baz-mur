@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <!-- AdMob : App ID (à déclarer aussi côté natif — AndroidManifest.xml / capacitor.config) -->
+    <meta name="admob-app-id" content="ca-app-pub-7087290056091576~9295373760">
+    <title>MORIS BAZ — Platform e-Commerce v4</title>
+    <style>
+        :root {
+            --navy: #10254b;
+            --blue: #1768f5;
+            --muted: #66738c;
+            --line: #e5eaf2;
+            --soft: #f4f7fb;
+            --green: #14a878;
+            --red: #ef476f;
+            --orange: #ff9800;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            background: #fff;
+            color: var(--navy);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        button, input, textarea, select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Espace réservé en bas quand la bannière AdMob native est affichée */
+        body.has-admob-banner .app {
+            padding-bottom: 54px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #edf0f5;
+            padding: 10px 14px 12px;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex: 1;
+            border: 0;
+            background: none;
+            text-align: left;
+            padding: 0;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .brandtext {
+            font-size: 22px;
+            font-weight: 950;
+            letter-spacing: -1px;
+            white-space: nowrap;
+        }
+
+        .brandtext span {
+            color: var(--blue);
+        }
+
+        .tag {
+            display: block;
+            font-size: 9px;
+            color: var(--muted);
+            font-weight: 650;
+        }
+
+        .actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .iconbtn {
+            border: 0;
+            background: #fff;
+            min-width: 48px;
+            padding: 2px 1px;
+            position: relative;
+            color: var(--navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ico {
+            font-size: 22px;
+            line-height: 23px;
+        }
+
+        .lbl {
+            font-size: 10px;
+        }
+
+        .badge {
+            position: absolute;
+            right: 0;
+            top: -3px;
+            background: var(--red);
+            color: #fff;
+            border-radius: 20px;
+            min-width: 19px;
+            height: 19px;
+            font-size: 10px;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+        }
+
+        .search {
+            margin-top: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid #dfe5ef;
+            border-radius: 18px;
+            padding: 9px 13px;
+            background: #fff;
+        }
+
+        .search span {
+            font-size: 24px;
+            color: #52617b;
+        }
+
+        .search input {
+            border: 0;
+            outline: 0;
+            width: 100%;
+            font-size: 15px;
+        }
+
+        /* ===== MAIN PAGES ===== */
+        .page {
+            display: none;
+            padding: 14px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ===== PRODUCTS GRID ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .product-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--navy);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--soft);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 8px;
+            object-fit: cover;
+        }
+
+        .product-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .btn-add {
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 4px;
+            margin-top: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== CATEGORIES ===== */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .category-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--soft);
+        }
+
+        .category-card:hover {
+            background: var(--line);
+            transform: scale(1.02);
+        }
+
+        .category-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* ===== FORMS ===== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0e5cc9;
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--soft);
+            color: var(--navy);
+        }
+
+        /* ===== FOOTER NAV ===== */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            padding: 8px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--muted);
+            transition: color 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .nav-item.active {
+            color: var(--blue);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* ===== LAYOUT ADJUSTMENTS ===== */
+        .app {
+            padding-bottom: 70px;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* ===== PAYMENT PAGE ===== */
+        .payment-box {
+            background: var(--soft);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-total {
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 2px solid var(--line);
+        }
+
+        /* ===== HIDDEN SECTION ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-content {
+                max-width: 95%;
+                max-height: 80vh;
+            }
+        }
+        .product-image img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+        .heart{position:absolute;right:8px;top:8px;background:#fff;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:16px;z-index:2;padding:0}
+        .card{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:#fff}
+        .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .muted{color:var(--muted);font-size:12px}
+        .pill{color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}
+        .stat{color:#fff;padding:14px 8px;border-radius:10px;text-align:center}
+        .stat b{display:block;font-size:22px}.stat span{font-size:11px}
+        .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+        .stars{color:#f5a623;font-size:14px}
+        .star-btn{border:0;background:none;font-size:30px;color:#ccd3e0;padding:0 2px}
+        .star-btn.on{color:#f5a623}
+        .thumb{width:54px;height:54px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:28px;flex:none;overflow:hidden}
+        .thumb img{width:100%;height:100%;object-fit:cover}
+        .proof{max-width:100%;max-height:260px;border-radius:8px;border:1px solid var(--line);margin-top:6px}
+        .h-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:12px;overflow-x:auto;padding-bottom:8px}
+        .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:99;max-width:90%;text-align:center}
+        .menu-item{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:14px 4px;font-size:16px}
+        .btn{display:inline-block;padding:11px 14px;border-radius:10px;border:0;font-weight:700}
+        .btn-sm{padding:7px 10px;font-size:12px;border-radius:8px}
+        .form-group input,.form-group textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px}
+        .btn:disabled{opacity:.5}
+        h3{margin:16px 0 8px}
+    </style>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="header">
+        <div class="top">
+            <button class="brand" onclick="logoClick()">
+                <span class="logo">🛒</span>
+                <div><div class="brandtext">MORIS <span>BAZ</span></div><span class="tag">Achte Lokal • Soutenir Nou Moris</span></div>
+            </button>
+            <div class="actions">
+                <button class="iconbtn" onclick="go('cart')"><span class="ico">🛒</span><span class="lbl">Panier</span><span class="badge hidden" id="cart-badge">0</span></button>
+                <button class="iconbtn" onclick="go('seller')"><span class="ico">👤</span><span class="lbl">Vendeur</span></button>
+                <button class="iconbtn" onclick="openMenu()"><span class="ico">☰</span><span class="lbl">Menu</span><span class="badge hidden" id="menu-badge">0</span></button>
+            </div>
+        </div>
+        <div class="search"><span>🔍</span><input type="text" id="search-input" placeholder="Rechercher un produit, une marque, un vendeur" oninput="if(view!=='home')go('home');else render()"></div>
+    </div>
+    <div id="view" class="page active"></div>
+</div>
+
+<div id="menu-modal" class="modal"><div class="modal-content">
+    <button class="close-modal" onclick="closeMenu()">✕</button><h2>Menu</h2><div id="menu-body"></div>
+</div></div>
+
+<div id="report-modal" class="modal"><div class="modal-content">
+    <button class="close-modal" onclick="closeModal('report-modal')">✕</button><h2 id="rp-title">Signaler</h2>
+    <form onsubmit="sendReport(event)">
+        <div class="form-group"><label>Motif</label><select id="rp-reason" required></select></div>
+        <div class="form-group"><label>Détails (facultatif)</label><textarea id="rp-details" rows="3" maxlength="500"></textarea></div>
+        <button class="btn btn-danger" style="width:100%">Envoyer le signalement</button>
+        <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="closeModal('report-modal')">Annuler</button>
+    </form>
+</div></div>
+
+<div id="add-product-modal" class="modal"><div class="modal-content">
+    <button class="close-modal" onclick="closeModal('add-product-modal')">✕</button>
+    <h2>Ajouter un Produit</h2>
+    <form onsubmit="addProduct(event)">
+        <div class="form-group"><label>Nom du Produit</label><input type="text" id="product-name" required></div>
+        <div class="form-group"><label>Description</label><textarea id="product-desc" rows="3" required></textarea></div>
+        <div class="form-group"><label>Catégorie</label><select id="product-category" required onchange="fillSubs()"></select></div>
+        <div class="form-group"><label>Sous-catégorie</label><select id="product-sub" required><option value="">Choisissez d'abord une catégorie</option></select></div>
+        <div class="form-group"><label>Prix (Rs)</label><input type="number" id="product-price" step="0.01" min="1" required></div>
+        <div class="form-group hidden" id="product-sizes-group"><label>Tailles disponibles</label><div id="product-sizes"><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="XS" class="pz-size"> XS</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="S" class="pz-size"> S</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="M" class="pz-size"> M</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="L" class="pz-size"> L</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="XL" class="pz-size"> XL</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="XXL" class="pz-size"> XXL</label><label style="display:inline-block;margin:0 10px 8px 0"><input type="checkbox" value="3XL" class="pz-size"> 3XL</label></div></div>
+        <div class="form-group"><label>Image du Produit</label><input type="file" id="product-image" accept="image/*" required></div>
+        <button type="submit" id="add-btn" class="btn btn-success" style="width:100%">Publier le Produit</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('add-product-modal')" style="width:100%;margin-top:10px">Annuler</button>
+    </form>
+</div></div>
+
+<div id="seller-address-modal" class="modal"><div class="modal-content">
+    <button class="close-modal" onclick="closeModal('seller-address-modal')">✕</button>
+    <h2>📍 Adresse de retrait (Pick-up)</h2>
+    <p class="muted">Cette adresse sera montrée aux clients qui choisissent de venir chercher leur commande chez vous.</p>
+    <form onsubmit="saveSellerAddress(event)">
+        <div class="form-group"><label>District</label><select id="sa-dist" required><option value="">Choisir le district</option></select></div>
+        <div class="form-group"><label>Adresse complète (rue, numéro, village)</label><input id="sa-street" required></div>
+        <div class="form-group"><label>Repère / indications (facultatif)</label><input id="sa-note" placeholder="Ex : près de la pharmacie, portail bleu"></div>
+        <button class="btn btn-success" style="width:100%">Enregistrer mon adresse</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('seller-address-modal')" style="width:100%;margin-top:10px">Annuler</button>
+    </form>
+</div></div>
+
+<script>
+/* ========= FIREBASE : colle ici ta config (Console Firebase > Paramètres > Vos applications > Web) =========
+   Laisse null pour le mode local (données sur cet appareil uniquement). Exemple :
+   const FB_CONFIG = { apiKey:"...", authDomain:"xxx.firebaseapp.com", databaseURL:"https://xxx-default-rtdb.firebaseio.com", projectId:"xxx", appId:"..." };  */
+const FB_CONFIG = {
+  apiKey:"AIzaSyArDet0H3DgnQTrcly_lB0XtwL_f6taqFY",
+  authDomain:"moris-baz.firebaseapp.com",
+  databaseURL:"https://moris-baz-default-rtdb.firebaseio.com", /* ← à vérifier dans Firebase > Realtime Database */
+  projectId:"moris-baz",
+  storageBucket:"moris-baz.firebasestorage.app",
+  messagingSenderId:"26594770888",
+  appId:"1:26594770888:web:eae2e80a48629d4c02cafd"
+};
+
+/* ========= Utilitaires ========= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const Rs=n=>Number(n||0).toFixed(2)+' Rs';
+const H=s=>{let h=5381;for(const c of String(s))h=((h<<5)+h+c.charCodeAt(0))|0;return 'h'+h};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const CODE_LETTERS='ABCDEFGHJKLMNPQRSTUVWXYZ';
+function genCode(){
+  let c;const used=new Set(Object.values(DB.get('products')).map(p=>p.code).filter(Boolean));
+  do{c='';for(let i=0;i<5;i++)c+=CODE_LETTERS[Math.floor(Math.random()*CODE_LETTERS.length)]}while(used.has(c));
+  return c;
+}
+function codeOf(id){
+  const p=DB.get('products')[id];if(!p)return id;
+  if(p.code)return p.code;
+  const c=genCode();DB.set('products/'+id+'/code',c);return c;
+}
+function productByCode(code){
+  code=(code||'').trim().toUpperCase();if(!code)return null;
+  const P=DB.get('products');
+  if(P[code])return P[code].id; /* code saisi = identifiant complet (compatibilité) */
+  for(const id in P)if((P[id].code||'').toUpperCase()===code)return id;
+  return null;
+}
+/* ========= Cadeaux gratuits (code unique MUBAZ) ========= */
+const GIFT_CODE='MUBAZ';
+const PROMO_CODE='PROMO';  /* Code de promotion - déduction commission */
+const commDue=id=>due(id).reduce((a,o)=>a+o.commission,0);
+const giftEligible=()=>vis().filter(p=>{const d=commDue(p.sellerId);return d>0&&p.price<=d});
+const promoActive=()=>!!cfg().promoActive;
+const getPromoDiscount=()=>parseFloat(cfg().promoDiscount||5);  /* % de réduction */
+function toggleGiftProgram(){
+  if(!isAdm())return;const on=!cfg().giftActive;DB.set('settings/giftActive',on);
+  toast(on?'✅ Programme de cadeaux gratuits activé — le message apparaît sur la page d\'accueil':'Programme de cadeaux gratuits désactivé');
+}
+function useGiftCode(){
+  const v=prompt('Entrez le code cadeau (5 lettres)');if(v===null)return;
+  if((v||'').trim().toUpperCase()!==GIFT_CODE)return toast('Code cadeau invalide');
+  go('giftCatalog');
+}
+function giveGift(pid){
+  const s=me(),p=DB.get('products')[pid];if(!s||!p||p.sellerId!==s.id)return;
+  const d=commDue(s.id);if(p.price>d)return toast('Ce produit dépasse votre commission due, il n\'est plus éligible');
+  if(!confirm('Confirmer que vous avez remis « '+p.name+' » gratuitement à un client avec le code '+GIFT_CODE+' ?\n'+Rs(p.price)+' seront déduits de votre commission due.'))return;
+  const key='s:'+s.id,r=DB.get('rewards')[key]||{balance:0,history:[]};
+  const hist=[...(r.history||[]),{amount:p.price,reason:'Cadeau gratuit offert ('+p.name+', code '+GIFT_CODE+')',ts:Date.now()}].slice(-50);
+  DB.set('rewards/'+key,{balance:(r.balance||0)+p.price,history:hist});
+  autoSettle(s.id);
+  notify('admin','🎁 Cadeau gratuit donné',`${s.name} a offert « ${p.name} » (${Rs(p.price)}) via le code ${GIFT_CODE}`);
+  toast('✅ '+Rs(p.price)+' déduits de votre commission');render();
+}
+
+/* ========= PROMOTIONS (déduit de la commission vendeur) ========= */
+function togglePromoProgram(){
+  if(!isAdm())return;const on=!cfg().promoActive;DB.set('settings/promoActive',on);
+  toast(on?'✅ Programme de promotions activé':'Programme de promotions désactivé');
+}
+function usePromoCode(){
+  const v=prompt('Entrez le code de promotion (ex: PROMO)');if(v===null)return;
+  if((v||'').trim().toUpperCase()!==PROMO_CODE)return toast('Code de promotion invalide');
+  LS.set('MB_PROMO',PROMO_CODE);toast('✅ Promotion appliquée à votre panier');render();
+}
+function promoApplied(){return LS.get('MB_PROMO')===PROMO_CODE}
+function clearPromo(){LS.set('MB_PROMO',null);render()}
+function calculatePromoDiscount(cart){
+  /* Calcule la réduction totale basée sur les commissions des vendeurs */
+  if(!promoActive()||!promoApplied())return 0;
+  const discRate=getPromoDiscount()/100;let totalDiscount=0;
+  const grouped={};
+  cart.forEach(item=>{const p=DB.get('products')[item.id];if(p){if(!grouped[p.sellerId])grouped[p.sellerId]=[];grouped[p.sellerId].push(item)}});
+  Object.entries(grouped).forEach(([sid,items])=>{
+    const comm=commDue(sid);if(comm<=0)return;
+    const itemTotal=items.reduce((a,i)=>a+(DB.get('products')[i.id]?.price||0)*i.qty,0);
+    totalDiscount+=Math.round(itemTotal*discRate);
+  });
+  return Math.min(totalDiscount,cart.reduce((a,i)=>a+(DB.get('products')[i.id]?.price||0)*i.qty,0));
+}
+function promoHTML(){
+  const on=!!cfg().promoActive;
+  return `<h3>🏷️ Promotions</h3>
+  <div class="card"><div class="row"><span>Code de promotion actif</span><button class="btn btn-sm ${on?'btn-success':'btn-secondary'}" onclick="togglePromoProgram()">${on?'✅ Activé':'Désactivé'}</button></div>
+  <p class="muted" style="margin-top:6px">Code : <b>${PROMO_CODE}</b> (${getPromoDiscount()}% de réduction). Déduit directement de la commission des vendeurs. Un vendeur n'a pas de commission impayée ? Aucune réduction n'est appliquée pour lui.</p></div>`;
+}
+const norm=s=>String(s).replace(/\D/g,'').replace(/^230(?=\d{8}$)/,'');
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('⚠️ Stockage plein')}}};
+const cid=LS.get('MB_CID')||(()=>{const i='c'+uid();LS.set('MB_CID',i);return i})();
+const SIZES=['XS','S','M','L','XL','XXL','3XL'];
+const norm2=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const CATS=[['Supermarchés','🛒'],['Magasins','🏬'],['Automobile','🚗'],['Électronique','📱'],['Maison & Jardin','🏠'],['Beauté & Santé','💅'],['Mode & Accessoires','👗'],['Services','🔧']];
+const ST={PENDING:['En attente','var(--orange)'],APPROVED:['Validée','var(--green)'],REJECTED:['Refusée','var(--red)']};
+let view='home',arg=null,hist=[];
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
+const readFile=f=>new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=ko;r.readAsDataURL(f)});
+const shrink=(src,max,q)=>new Promise(ok=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',q))};im.onerror=()=>ok(src);im.src=src});
+const photo=async(f,max,q)=>shrink(await readFile(f),max,q);
+const proofHTML=(id,inl)=>{const d=inl||DB.mem['proofs/'+id];return d?`<a href="${d}" target="_blank"><img class="proof" src="${d}"></a>`:`<button class="btn btn-secondary btn-sm" style="margin-top:6px" onclick="showProof('${id}',this)">📷 Voir la preuve</button>`};
+async function showProof(id,btn){btn.disabled=true;btn.textContent='Chargement…';const d=await DB.blob('proofs/'+id);
+  if(!d){btn.disabled=false;btn.textContent='📷 Pas encore reçue — réessayer';return}btn.outerHTML=proofHTML(id)}
+const img=x=>/^(data:|https?:)/.test(x||'')?`<img src="${x}">`:(x||'📦');
+
+/* ========= Base de données (Firebase Realtime DB ou local) ========= */
+const BLOB=/^(pimg|proofs|kyc|vidblob)\//;
+const DB={fb:null,S:{},cbs:[],ready:{},mem:{},online:false,fbFailed:false,diag:'',
+  cols:['products','orders','sellers','commPay','ratings','notifs','settings','admins','reports','clients','rewards','videos','videoPay'],
+  P1:['products','sellers','settings','admins'],P2:['ratings','notifs','orders','commPay','reports','clients','rewards','videos','videoPay'],
+  init(){
+    /* 1) Affichage immédiat depuis le cache local (dernières données connues) */
+    const local=LS.get('MB_DB',{});
+    this.cols.forEach(c=>this.S[c]=(local&&local[c])?local[c]:{});
+    if(FB_CONFIG&&window.firebase){this.connect();return}
+    this.purge();
+  },
+  async connect(){
+    /* 2) URL de la base : mémorisée, sinon détectée automatiquement (US / Europe / Asie) */
+    let url=LS.get('MB_FBURL');
+    if(!url){
+      const pid=FB_CONFIG.projectId,c=[...new Set([FB_CONFIG.databaseURL,`https://${pid}-default-rtdb.firebaseio.com`,`https://${pid}-default-rtdb.europe-west1.firebasedatabase.app`,`https://${pid}-default-rtdb.asia-southeast1.firebasedatabase.app`])];
+      let net=false;
+      const probe=async u=>{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);
+        try{const r=await fetch(u+'/.json?shallow=true',{signal:ac.signal,cache:'no-store'});clearTimeout(t);return(r.status===200||r.status===401)?u:null}
+        catch(e){clearTimeout(t);net=true;return null}};
+      url=await new Promise(res=>{let n=c.length;c.forEach(u=>probe(u).then(r=>{if(r)res(r);else if(--n===0)res(null)}))});
+      if(!url&&net&&navigator.onLine!==false)url=await this.race(c);   /* sonde REST bloquée : test via le SDK */
+      if(url)LS.set('MB_FBURL',url);
+      else if(navigator.onLine===false)url=FB_CONFIG.databaseURL;      /* hors-ligne : Firebase réessaiera */
+      else{this.diag='nodb';this.emit('conn');return}
+    }
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(Object.assign({},FB_CONFIG,{databaseURL:url}));
+      this.fb=firebase.database();
+    }catch(e){console.error(e);this.diag='init';this.emit('conn');return}
+    this.fb.ref('.info/connected').on('value',s=>{this.online=!!s.val();if(this.online)this.diag='';this.emit('conn')});
+    this.sub(this.P1);                                        /* produits & vendeurs d'abord */
+    setTimeout(()=>this.sub(this.P2),400);                    /* puis le reste */
+    setTimeout(()=>{if(!this.ready.admins){this.fbFailed=true;this.emit('admins')}},7000);
+  },
+  race(c){return new Promise(res=>{let done=false;const apps=[];
+    const fin=u=>{if(done)return;done=true;apps.forEach(x=>{try{x.delete()}catch(e){}});res(u)};
+    c.forEach((u,i)=>{try{const x=firebase.initializeApp(Object.assign({},FB_CONFIG,{databaseURL:u}),'probe'+i);apps.push(x);
+      x.database().ref('.info/connected').on('value',v=>{if(v.val())fin(u)})}catch(e){}});
+    setTimeout(()=>fin(null),8000)})},
+  sub(cols){cols.forEach(c=>this.fb.ref(c).on('value',
+    s=>{this.S[c]=s.val()||{};this.ready[c]=1;this.purge();this.persist();this.emit(c)},
+    err=>{console.warn('Firebase '+c,err);if(/permission/i.test(err.message||err.code)){this.diag='rules'}this.fbFailed=true;this.emit(c);this.emit('conn')}))},
+  persist(){clearTimeout(this._pt);this._pt=setTimeout(()=>{try{localStorage.setItem('MB_DB',JSON.stringify(this.S))}catch(e){}},400)},
+  status(){
+    if(!FB_CONFIG)return '⚪ Mode local — non partagé';
+    if(this.diag==='nodb')return '🔴 Realtime Database introuvable : créez-la dans la console Firebase (Build › Realtime Database)';
+    if(this.diag==='rules')return '🔴 Accès refusé : modifiez les règles (Rules) de Realtime Database';
+    if(this.diag==='init')return '🔴 Erreur d\'initialisation Firebase';
+    return this.online?'🟢 Connecté — produits partagés':'🟡 Connexion en cours…';
+  },
+  DEMO:['57123456','57654321','57111111'],
+  purge(){
+    if(this.purged||(this.fb&&!(this.ready.products&&this.ready.sellers)))return;this.purged=1;
+    Object.values(this.S.products||{}).forEach(p=>{if(this.DEMO.includes(p.sellerId)&&/^p[0-2]$/.test(p.id))this.set('products/'+p.id,null)});
+    this.DEMO.forEach(id=>{const s=(this.S.sellers||{})[id];if(s&&s.pin===H('0000'))this.set('sellers/'+id,null)});
+  },
+  get(c){return this.S[c]||{}},list(c){return Object.values(this.get(c))},
+  emit(c){this.cbs.forEach(f=>f(c))},
+  /* Gros fichiers (photo produit HD, preuves) : nœuds séparés, chargés à la demande */
+  async blob(path){
+    if(this.mem[path])return this.mem[path];
+    if(this.fb){try{const v=(await this.fb.ref(path).once('value')).val();if(v)this.mem[path]=v;return v}catch(e){return null}}
+    const p=path.split('/');return (this.S[p[0]]||{})[p[1]]||null;
+  },
+  set(path,val){
+    if(val===undefined)val=null;
+    if(BLOB.test(path)){
+      if(val===null)delete this.mem[path];else this.mem[path]=val;
+      if(this.fb)return this.fb.ref(path).set(val).catch(e=>{toast('⚠️ Envoi impossible : '+e.message);throw e});
+    }
+    const p=path.split('/');let o=this.S;
+    for(let i=0;i<p.length-1;i++)o=o[p[i]]=o[p[i]]||{};
+    const k=p[p.length-1];if(val===null)delete o[k];else o[k]=val;
+    if(!BLOB.test(path))this.persist();else if(!this.fb)LS.set('MB_DB',this.S);
+    this.emit(p[0]);
+    if(this.fb&&!BLOB.test(path))return this.fb.ref(path).set(val).catch(e=>{console.warn('Firebase écriture '+path,e);toast('⚠️ Synchronisation impossible')});
+    return Promise.resolve();
+  }};
+
+/* ========= Accès données ========= */
+const admins=()=>DB.get('admins');
+const isAdm=()=>{const i=LS.get('MB_ADM');return !!(i&&admins()[i])};
+const curAdm=()=>admins()[LS.get('MB_ADM')]||null;
+const cfg=()=>{const a=Object.values(admins())[0];return Object.assign({comm:10,commRate:10,commMax:20,ship:100,videoPrice:1000,appLink:'https://wa.me/message/HSZF5AZEX66FA1',siteLink:'',apkLink:'',waGroupLink:'https://chat.whatsapp.com/Hb9j4zcNa084tvFzlBlo1d?s=cl&p=a&mlu=4&ilr=4&iam=0'},DB.get('settings'),{juice:a?a.id:''})};
+const videoPrice=()=>cfg().videoPrice||1000;
+function commissionFor(amount){
+  const rate=(cfg().commRate||0)/100,max=cfg().commMax;
+  return Math.min(max,Math.round(amount*rate*100)/100);
+}
+const sellerShip=id=>{const s=sellers()[id];return(s&&s.ship!=null)?s.ship:cfg().ship};
+const SUBS={'Supermarchés':['Alimentation','Boissons','Produits frais','Épicerie','Hygiène & entretien'],
+'Magasins':['Général','Papeterie','Quincaillerie','Jouets','Sport'],
+'Automobile':['Voitures','Motos','Pièces & accessoires','Entretien'],
+'Électronique':['Téléphones','Ordinateurs','TV & audio','Accessoires','Électroménager'],
+'Maison & Jardin':['Meubles','Décoration','Cuisine','Jardin','Bricolage'],
+'Beauté & Santé':['Soins du visage','Maquillage','Parfums','Cheveux','Santé & bien-être'],
+'Mode & Accessoires':['Vêtements homme','Vêtements femme','Vêtements enfants','Chaussures','Sacs & accessoires','Bijoux & montres'],
+'Services':['Cours & Formation','Réparation','Transport','Événements','Autres']};
+const CST={NONE:'—',DUE:'Due',PENDING:'En vérification',PAID:'Payée'};
+const REWARD_CLIENT=30,REWARD_SELLER=100;
+/* ---- Compteurs de vues journaliers (produits) ----
+   Chaque objet produit garde 2 champs :
+   viewsDay (date du jour où la dernière vue a été comptée) et viewsToday (nombre de vues ce jour-là).
+   À l'affichage, si viewsDay ne correspond pas à aujourd'hui, on affiche 0 (remise à zéro automatique,
+   sans avoir besoin d'écrire dans la base tant qu'aucune nouvelle vue n'arrive). */
+const todayKey=()=>new Date().toDateString();
+const viewsToday=obj=>(obj&&obj.viewsDay===todayKey())?(obj.viewsToday||0):0;
+function bumpDailyViews(basePath,obj){
+  const day=todayKey();
+  if(obj.viewsDay!==day){DB.set(basePath+'/viewsDay',day);DB.set(basePath+'/viewsToday',1)}
+  else DB.set(basePath+'/viewsToday',(obj.viewsToday||0)+1);
+}
+/* Comptabilise une vue produit (ignore les vues du vendeur sur son propre produit) */
+function countProductView(id){
+  const p=DB.get('products')[id];if(!p)return;
+  const s=me();if(s&&s.id===p.sellerId)return;
+  bumpDailyViews('products/'+id,p);
+}
+
+/* ========= Vidéo boutique (page d'accueil) =========
+   1 vidéo active max par vendeur, stockée dans videos/{sellerId}.
+   Le fichier vidéo (gros) est dans un nœud séparé vidblob/{sellerId} (comme pimg/proofs/kyc).
+   Paiement (1000 Rs par défaut, comme les commissions) : videoPay/{id}, preuve dans proofs/{id}.
+   Durée acceptée : 15s à 60s (1 minute). Au-delà de 60s → refusée.
+   Une fois validée par l'admin, la vidéo reste en ligne 24h (liveAt + 24h) puis disparaît
+   (le vendeur peut la payer à nouveau pour la réafficher — facultatif). */
+const VIDEO_MIN_SEC=15,VIDEO_MAX_SEC=60,VIDEO_DAY_MS=864e5;
+const VIDEO_MAX_BYTES=6*1024*1024;          /* taille brute max acceptée pour le fichier vidéo (~6 Mo) */
+const VIDEO_MAX_ENCODED=9.3*1024*1024;      /* sécurité : Firebase refuse toute valeur > 10 Mo une fois encodée en base64 */
+const myVideo=sid=>DB.get('videos')[sid]||null;
+function videoIsLive(v){return !!(v&&v.status==='ACTIVE'&&v.liveAt&&(Date.now()-v.liveAt)<VIDEO_DAY_MS)}
+function videoExpired(v){return !!(v&&v.status==='ACTIVE'&&v.liveAt&&(Date.now()-v.liveAt)>=VIDEO_DAY_MS)}
+function activeVideosSorted(){
+  return Object.values(DB.get('videos')).filter(v=>videoIsLive(v)&&!(sellers()[v.sellerId]&&sellers()[v.sellerId].blocked)).sort((a,b)=>a.liveAt-b.liveAt);
+}
+/* Rotation aléatoire par session : à chaque fermeture/réouverture de l'application,
+   l'ordre des vidéos tourne (les dernières positions deviennent premières). */
+function activeVideosRotated(){
+  const arr=activeVideosSorted();if(arr.length<2)return arr;
+  let rot=parseInt(sessionStorage.getItem('MB_VID_ROT'),10);
+  if(isNaN(rot)){rot=Math.floor(Math.random()*arr.length);try{sessionStorage.setItem('MB_VID_ROT',rot)}catch(e){}}
+  rot=((rot%arr.length)+arr.length)%arr.length;
+  return arr.slice(rot).concat(arr.slice(0,rot));
+}
+function countVideoView(sellerId){
+  const v=DB.get('videos')[sellerId];if(!v)return;
+  const s=me();if(s&&s.id===sellerId)return;
+  bumpDailyViews('videos/'+sellerId,v);
+}
+function videoBlock(v){
+  const cached=DB.mem['vidblob/'+v.sellerId];
+  return `<div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+    <div style="cursor:pointer" onclick="go('sellerShop','${v.sellerId}')">
+      <video id="vid-${v.sellerId}" ${cached?`src="${cached}"`:''} autoplay muted loop playsinline style="width:100%;display:block;max-height:420px;background:#000"></video>
+      <div style="padding:10px 12px"><b>🎬 ${esc(sName(v.sellerId))}</b><div class="muted">Touchez la vidéo pour voir la boutique</div></div>
+    </div></div>`;
+}
+/* Insère la 1ère vidéo tout en haut, la 2e après 10 produits, la 3e après 20, etc. */
+function videoFeedHTML(list,vids){
+  if(!vids.length)return `<div class="grid">${list.map(card).join('')||'<p class="muted">'+(FB_CONFIG&&!DB.ready.products?'Chargement des produits…':'Aucun produit')+'</p>'}</div>`;
+  let html=videoBlock(vids[0]),vi=1,pi=0;
+  if(!list.length){for(;vi<vids.length;vi++)html+=videoBlock(vids[vi]);return html}
+  while(pi<list.length){
+    html+=`<div class="grid">${list.slice(pi,pi+10).map(card).join('')}</div>`;pi+=10;
+    if(vi<vids.length){html+=videoBlock(vids[vi]);vi++}
+  }
+  while(vi<vids.length){html+=videoBlock(vids[vi]);vi++}
+  return html;
+}
+const myReward=key=>(DB.get('rewards')[key]||{}).balance||0;
+function creditReward(key,amount,reason){
+  const r=DB.get('rewards')[key]||{balance:0,history:[]};
+  const hist=[...(r.history||[]),{amount,reason,ts:Date.now()}].slice(-50);
+  DB.set('rewards/'+key,{balance:(r.balance||0)+amount,history:hist});
+  notify(key,'🎁 Récompense de parrainage',`+${Rs(amount)} — ${reason}`);
+  if(key[0]==='s')autoSettle(key.slice(2));
+}
+function useReward(key,amount,reason){
+  const r=DB.get('rewards')[key]||{balance:0,history:[]};
+  const hist=[...(r.history||[]),{amount:-amount,reason,ts:Date.now()}].slice(-50);
+  DB.set('rewards/'+key,{balance:Math.max(0,(r.balance||0)-amount),history:hist});
+}
+function autoSettle(sellerId){
+  const dl=due(sellerId);if(!dl.length)return;
+  const dueSum=dl.reduce((a,o)=>a+o.commission,0),avail=myReward('s:'+sellerId);
+  if(avail<=0)return;const applied=Math.min(avail,dueSum);if(applied<=0)return;
+  useReward('s:'+sellerId,applied,'Déduit automatiquement de votre commission');
+  if(applied>=dueSum){
+    dl.forEach(o=>DB.set('orders/'+o.id+'/commStatus','PAID'));
+    notify('s:'+sellerId,'🎁 Commission réglée','Votre solde de parrainage a couvert votre commission due.');
+    if(sellers()[sellerId]&&sellers()[sellerId].blocked)DB.set('sellers/'+sellerId+'/blocked',false);
+  }
+}
+const netDue=id=>Math.max(0,due(id).reduce((a,o)=>a+o.commission,0)-myReward('s:'+id));
+function ensureClient(){if(!DB.get('clients')[cid])DB.set('clients/'+cid,{id:cid,ts:Date.now(),rewarded:false})}
+function findReferrer(code){
+  code=(code||'').trim();if(!code)return null;
+  if(code===cid||(me()&&code===me().id))return null;
+  if(DB.get('clients')[code])return{key:'c:'+code,type:'Client'};
+  if(sellers()[code])return{key:'s:'+code,type:'Vendeur'};
+  return null;
+}
+function shareApp(kind){
+  const id=me()?me().id:cid,code=generateReferralCode(id),link=cfg().appLink;
+  const msg=kind==='seller'
+    ?`🛍️ Rejoins MORIS BAZ comme vendeur et vends tes produits en ligne !\n\n📲 Télécharge l'app : ${link||'(lien à demander à l\'expéditeur)'}\n\n🎁 Utilise mon code de parrainage à l'inscription : ${code}\nJe gagne une récompense grâce à toi, merci !`
+    :`🛒 Découvre MORIS BAZ — Achte Lokal • Soutenir Nou Moris !\n\n📲 Télécharge l'app : ${link||'(lien à demander à l\'expéditeur)'}\n\n🎁 Utilise mon code de parrainage à l'inscription : ${code}\nOn gagne tous les deux des récompenses !`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+async function shareProduct(id){
+  const p=DB.get('products')[id];if(!p)return;
+  const code=codeOf(id),wa=cfg().waGroupLink,site=cfg().siteLink?cfg().siteLink.replace(/\/$/,'')+'/?p='+code:'';
+  const text=`🛍️ ${p.name} — ${Rs(p.price)}\nVendu par ${sName(p.sellerId)} sur MORIS BAZ`
+    +`\n\n🔑 Code produit : ${code}`
+    +(site?`\n👉 ${site}`:`\n(Ouvre l'app MORIS BAZ, Menu › J'ai un code produit, et colle : ${code})`)
+    +(wa?`\n\n📲 Pas encore l'app ? Rejoins le groupe : ${wa}`:'');
+  const full=DB.mem['pimg/'+id]||p.image;let file=null;
+  try{
+    if(/^data:/.test(full)){const r=await fetch(full),blob=await r.blob();file=new File([blob],'produit.jpg',{type:blob.type||'image/jpeg'})}
+  }catch(e){}
+  try{
+    if(navigator.share&&file&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:p.name,text});return;
+    }
+    if(navigator.share){await navigator.share({title:p.name,text});return}
+  }catch(e){if(e&&e.name==='AbortError')return}
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+function useProductCode(){
+  const v=prompt('Collez ou tapez le code du produit (5 lettres)');if(v===null)return;
+  const id=productByCode(v);if(!id)return toast('Produit introuvable pour ce code');
+  go('product',id);
+}
+function checkDeepLink(){
+  try{
+    const qs=new URLSearchParams(location.search);let code=qs.get('p');
+    if(!code){const m=location.hash.match(/p=([^&]+)/);if(m)code=decodeURIComponent(m[1])}
+    if(!code)return;
+    const open=()=>{
+      if(DB.ready.products){const id=productByCode(code);history.replaceState(null,'',location.pathname);if(id)go('product',id)}
+      else setTimeout(open,300);
+    };
+    open();
+  }catch(e){}
+}
+const commWarn=(s,d)=>d>0&&!s.blocked?`<div class="alert alert-error">⚠️ <b>Commission à payer : ${Rs(d)}</b><br>Payez-la à l'admin par Juice. Si elle reste impayée, <b>votre compte sera bloqué</b> et vos produits seront masqués.${s.remindedAt?`<br>📩 Réclamée par l'admin le ${new Date(s.remindedAt).toLocaleDateString('fr-MU')}.`:''}</div>`:'';
+const sellers=()=>DB.get('sellers');
+const me=()=>{const s=LS.get('MB_SESS');return s&&sellers()[s.id]||null};
+const vis=()=>DB.list('products').filter(p=>{const s=sellers()[p.sellerId];return !(s&&s.blocked)}).sort((a,b)=>(b.ts||0)-(a.ts||0));
+const sName=id=>(sellers()[id]||{}).name||'Vendeur';
+const favs=()=>new Set(LS.get('MB_FAV',[]));
+const cart=()=>LS.get('MB_CART',[]);
+const rats=pid=>Object.values(DB.get('ratings')[pid]||{});
+const avg=pid=>{const r=rats(pid);return r.length?r.reduce((a,x)=>a+x.stars,0)/r.length:0};
+const starsHTML=pid=>{const r=rats(pid);return r.length?`<span class="stars">★ ${avg(pid).toFixed(1)}</span> <span class="muted">(${r.length})</span>`:'<span class="muted">Pas encore noté</span>'};
+
+/* ========= Notifications ========= */
+function notify(to,title,body){const id='n'+uid();DB.set('notifs/'+id,{id,to,title,body,ts:Date.now()})}
+const targets=()=>{const t=['c:'+cid],s=me();if(s)t.push('s:'+s.id);if(isAdm())t.push('admin');return t};
+const myNotifs=()=>DB.list('notifs').filter(n=>targets().includes(n.to)).sort((a,b)=>b.ts-a.ts);
+const unread=()=>{const r=new Set(LS.get('MB_READ',[]));return myNotifs().filter(n=>!r.has(n.id)).length};
+function pushNew(){
+  const seen=new Set(LS.get('MB_SEEN',[])),t=targets();let ch=false;
+  DB.list('notifs').filter(n=>t.includes(n.to)&&!seen.has(n.id)).forEach(n=>{
+    seen.add(n.id);ch=true;
+    if(n.ts>Date.now()-864e5){toast('🔔 '+n.title+' — '+n.body);try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}
+      try{if(window.Notification&&Notification.permission==='granted')new Notification(n.title,{body:n.body})}catch(e){}}
+  });
+  if(ch)LS.set('MB_SEEN',[...seen].slice(-300));
+}
+function askPush(){
+  if(!window.Notification)return toast('Notifications non supportées ici');
+  Notification.requestPermission().then(p=>toast(p==='granted'?'🔔 Notifications activées':'Notifications refusées'));
+}
+
+/* ========= Navigation ========= */
+const LIVE=['home','seller','adminSeller','category','favs','myorders','notifs','sellerHome','sellerOrders','sellerComm','admin','product','cart','referral','giftCatalog','referralInfo','sellerTerms','sellerShop','sellerVideoNew','sellerVideoRenew','sellerVideoInfo'];
+function go(v,a,isBack){
+  if(!isBack&&(v!==view||a!==arg))hist.push([view,arg]);
+  view=v;arg=a;
+  if(v==='product'){const l=LS.get('MB_VIEW',[]).filter(x=>x!==a);l.push(a);LS.set('MB_VIEW',l.slice(-30));countProductView(a)}
+  if(v==='home'){activeVideosSorted().forEach(vd=>countVideoView(vd.sellerId))}
+  if(v==='notifs'){LS.set('MB_READ',[...new Set([...LS.get('MB_READ',[]),...myNotifs().map(n=>n.id)])].slice(-400))}
+  render();window.scrollTo(0,0);closeMenu();badges();
+}
+function back(){const h=hist.pop();h?go(h[0],h[1],true):go('home',null,true)}
+function render(){
+  const q=($('#search-input').value||'').trim();
+  const html=(R[view]||R.home)(arg,q);
+  $('#view').innerHTML=html;
+  if(view==='product'&&arg)DB.blob('pimg/'+arg).then(d=>{const b=$('#pimg-box'),id=arg;if(d&&b&&view==='product'&&arg===id)b.innerHTML=img(d)});
+  if(view==='home')activeVideosRotated().forEach(v=>{
+    if(!DB.mem['vidblob/'+v.sellerId])DB.blob('vidblob/'+v.sellerId).then(d=>{const el=$('#vid-'+v.sellerId);if(d&&el&&view==='home'&&!el.getAttribute('src'))el.src=d});
+  });
+}
+function badges(){
+  const n=cart().reduce((a,i)=>a+i.qty,0),b=$('#cart-badge');b.textContent=n;b.classList.toggle('hidden',!n);
+  const u=unread(),m=$('#menu-badge');m.textContent=u;m.classList.toggle('hidden',!u);
+}
+const backBtn='<button class="btn btn-secondary btn-sm" onclick="back()">← Retour</button>';
+let lc=0,lt;
+function logoClick(){
+  go('home');lc++;clearTimeout(lt);lt=setTimeout(()=>lc=0,2000);
+  if(lc>=5){lc=0;go('admin')}
+}
+
+/* ========= Produits, favoris, recommandations ========= */
+function card(p){
+  const f=favs().has(p.id);
+  return `<div class="product-card" style="position:relative" onclick="go('product','${p.id}')">
+    <button class="heart" onclick="event.stopPropagation();toggleFav('${p.id}')">${f?'❤️':'🤍'}</button>
+    <div class="product-image">${img(p.image)}</div>
+    <div class="product-name">${esc(p.name)}</div>
+    <div class="product-category">${esc(p.sub||p.category)} · ${esc(sName(p.sellerId))}</div>${p.sizes&&p.sizes.length?`<div class="muted">Tailles : ${p.sizes.join(', ')}</div>`:''}
+    <div>${starsHTML(p.id)}</div>
+    <div class="product-price">${Rs(p.price)}</div>
+    <button class="btn-add" onclick="event.stopPropagation();addCart('${p.id}')">Ajouter</button></div>`;
+}
+function toggleFav(id){const f=favs();f.has(id)?f.delete(id):f.add(id);LS.set('MB_FAV',[...f]);render();toast(f.has(id)?'❤️ Ajouté aux favoris':'Retiré des favoris')}
+function recos(seedCat,exclude,n){
+  const w={},add=(c,x)=>w[c]=(w[c]||0)+x,P=DB.get('products');
+  favs().forEach(id=>P[id]&&add(P[id].category,3));
+  LS.get('MB_VIEW',[]).forEach(id=>P[id]&&add(P[id].category,1));
+  cart().forEach(i=>P[i.id]&&add(P[i.id].category,2));
+  Object.entries(DB.get('ratings')).forEach(([pid,rs])=>{const r=rs[cid];if(r&&P[pid]&&r.stars>=4)add(P[pid].category,3)});
+  if(seedCat)add(seedCat,5);
+  return vis().filter(p=>!exclude.includes(p.id)).map(p=>({p,s:(w[p.category]||0)+avg(p.id)*.4+(p.ts||0)/1e14}))
+    .sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.p);
+}
+function rate(pid,n){
+  DB.set('ratings/'+pid+'/'+cid,{stars:n,name:LS.get('MB_NAME','Client'),ts:Date.now()});toast('⭐ Merci pour votre note !');
+}
+
+/* ========= Panier multi-vendeurs ========= */
+function addCart(id){const c=cart(),i=c.find(x=>x.id===id);i?i.qty++:c.push({id,qty:1});LS.set('MB_CART',c);badges();toast('✅ Ajouté au panier')}
+function qty(id,d){let c=cart();const i=c.find(x=>x.id===id);if(i){i.qty+=d;if(i.qty<1)c=c.filter(x=>x!==i)}LS.set('MB_CART',c);badges();render()}
+function delCart(id){LS.set('MB_CART',cart().filter(x=>x.id!==id));badges();render()}
+let PAYSHIP={};
+function groups(){
+  const P=DB.get('products'),by={};
+  cart().forEach(i=>{const p=P[i.id];if(!p||!vis().some(v=>v.id===p.id))return;(by[p.sellerId]=by[p.sellerId]||[]).push({p,qty:i.qty})});
+  return Object.entries(by).map(([sid,lines])=>{
+    const sub=lines.reduce((a,l)=>a+l.p.price*l.qty,0),mode=PAYSHIP[sid]||'post',ship=mode==='pickup'?0:sellerShip(sid);
+    return{sid,lines,sub,ship,mode,total:sub+ship};
+  });
+}
+function setShipMode(sid,mode){
+  PAYSHIP[sid]=mode;
+  const ship=mode==='pickup'?0:sellerShip(sid),g=groups().find(x=>x.sid===sid);if(!g)return;
+  const shipRow=$('#shiprow-'+sid),shipVal=$('#shipval-'+sid),tot=$('#total-'+sid),pa=$('#pickupaddr-'+sid);
+  if(shipRow)shipRow.classList.toggle('hidden',mode==='pickup');
+  if(pa)pa.classList.toggle('hidden',mode!=='pickup');
+  if(shipVal)shipVal.textContent=Rs(ship);
+  if(tot)tot.textContent=Rs(g.sub+ship);
+  const grand=$('#grand-total');if(grand)grand.textContent=Rs(groups().reduce((a,x)=>a+x.total,0));
+}
+async function placeOrders(e){
+  e.preventDefault();ensureClient();const gs=groups();if(!gs.length)return toast('Panier vide');
+  const phone=$('#b-phone').value.trim(),name=$('#b-name').value.trim(),addr={district:$('#b-dist').value,street:$('#b-street').value.trim(),note:$('#b-note').value.trim()},files=gs.map(g=>$('#pf_'+g.sid).files[0]);
+  if(files.some(f=>!f))return toast('⚠️ Ajoutez une preuve pour chaque vendeur');
+  const btn=$('#pay-btn');btn.disabled=true;btn.textContent='Envoi en cours...';
+  try{
+    LS.set('MB_NAME',name);LS.set('MB_PHONE',phone);LS.set('MB_ADDR',addr);
+    for(let i=0;i<gs.length;i++){
+      const g=gs[i],proof=await photo(files[i],800,.6),items=[];
+      for(const l of g.lines)items.push({id:l.p.id,name:l.p.name,price:l.p.price,qty:l.qty,img:/^data:/.test(l.p.image)?await shrink(l.p.image,120,.5):l.p.image});
+      const id='o'+uid(),pickupAddress=g.mode==='pickup'?(sellers()[g.sid].address||null):null;
+      DB.set('orders/'+id,{id,sellerId:g.sid,clientId:cid,buyerName:name,buyerPhone:phone,address:addr,pickupAddress,deliveryMode:g.mode,items,subtotal:g.sub,shipping:g.ship,total:g.total,hasProof:true,status:'PENDING',commStatus:'NONE',commission:0,ts:Date.now()});
+      notify('s:'+g.sid,'🛍️ Nouvelle commande',`${name||phone} — ${Rs(g.total)}`);
+      DB.set('proofs/'+id,proof);
+    }
+    LS.set('MB_CART',[]);badges();toast('✅ Commandes envoyées aux vendeurs');go('myorders');
+  }catch(err){console.error(err);toast('Erreur: '+err.message);btn.disabled=false;btn.textContent='Valider les Paiements'}
+}
+
+/* ========= Rendu des commandes ========= */
+function orderCard(o,mode){
+  const [lbl,col]=ST[o.status]||['?','#999'];
+  const items=o.items.map(i=>`<div class="row" style="justify-content:flex-start;margin:6px 0"><div class="thumb">${img(i.img)}</div>
+    <div><b>${esc(i.name)}</b><div class="muted">${i.qty} × ${Rs(i.price)} = ${Rs(i.qty*i.price)}</div></div></div>`).join('');
+  let extra='';
+  if(mode==='seller'){
+    extra=`<div class="muted">👤 ${esc(o.buyerName||'Client')} — 📞 ${esc(o.buyerPhone)}</div>
+      <div class="muted" style="margin-top:6px">Preuve de paiement :</div>${proofHTML(o.id,o.proof)}`;
+    if(o.status==='PENDING')extra+=`<div class="row" style="margin-top:10px"><button class="btn btn-success" style="flex:1" onclick="setOrder('${o.id}','APPROVED')">✓ Valider</button><button class="btn btn-danger" style="flex:1" onclick="setOrder('${o.id}','REJECTED')">✕ Refuser</button></div>`;
+  }else extra=`<div class="muted">Vendeur : ${esc(sName(o.sellerId))} — Juice ${esc(o.sellerId)}</div><button class="btn btn-secondary btn-sm" style="margin-top:6px" onclick="openReport('seller','${o.sellerId}')">🚩 Signaler le vendeur</button>`;
+  return `<div class="card"><div class="row"><div><b>Commande #${o.id.slice(-6)}</b><div class="muted">${new Date(o.ts).toLocaleString('fr-MU')}</div></div>
+    <div style="text-align:right"><b style="color:var(--green)">${Rs(o.total)}</b><br><span class="pill" style="background:${col}">${lbl}</span></div></div>
+    <div style="margin:8px 0">${items}</div><div class="muted">${o.deliveryMode==='pickup'?'🏬 Retrait chez le vendeur (Pick-up)':'🚚 Livraison à domicile (Postage) : '+Rs(o.shipping)}</div>${o.deliveryMode==='pickup'?pickupAddrLine(o):addrLine(o)}${extra}</div>`;
+}
+function setOrder(id,st){
+  const s=me(),o=DB.get('orders')[id];if(!o||!s||o.sellerId!==s.id)return;
+  if(s.blocked&&st==='APPROVED')return toast('⛔ Compte bloqué : payez votre commission');
+  DB.set('orders/'+id+'/status',st);
+  if(st==='APPROVED'){
+    DB.set('orders/'+id+'/commission',commissionFor(o.total));DB.set('orders/'+id+'/commStatus','DUE');autoSettle(s.id);
+    const cl=DB.get('clients')[o.clientId];
+    if(cl&&cl.referredBy&&cl.referrerKey&&!cl.rewarded){DB.set('clients/'+o.clientId+'/rewarded',true);creditReward(cl.referrerKey,REWARD_CLIENT,'Premier achat de votre filleul')}
+  }
+  notify('c:'+o.clientId,st==='APPROVED'?'✅ Paiement validé':'❌ Paiement refusé',`Commande #${id.slice(-6)} chez ${s.name}`);
+  toast(st==='APPROVED'?'✅ Commande validée':'Commande refusée');
+}
+
+/* ========= Vues ========= */
+const R={};
+R.home=(a,q)=>{
+  let list=vis();
+  if(q){
+    const t=norm2(q);
+    const sellerHit=id=>norm2(sName(id)).includes(t)||norm2(sName(id)).split(/\s+/).some(w=>w.startsWith(t));
+    const prodHit=p=>[p.name,p.category,p.sub,...(p.sizes||[])].some(x=>norm2(x).includes(t));
+    /* Un vendeur qui correspond (nom, ou commence par la lettre tapée) affiche TOUS ses produits ;
+       sinon on affiche les produits dont le nom, la catégorie, la sous-catégorie ou la taille correspond. */
+    list=list.filter(p=>sellerHit(p.sellerId)||prodHit(p));
+  }
+  const rec=q?[]:recos(null,[],6);
+  const vids=q?[]:activeVideosRotated();
+  return `${isWeb()&&!q?`<div class="card" style="display:flex;align-items:center;gap:10px;justify-content:space-between"><div><b>📲 Application Moris Baz</b><div class="muted">Installez l'application sur votre téléphone Android</div></div><button class="btn btn-primary btn-sm" onclick="downloadApp()">Télécharger</button></div>`:''}
+  ${cfg().giftActive?`<div class="alert alert-warning">🎁 <b>Cadeaux gratuits disponibles !</b> Utilisez le code <b>${GIFT_CODE}</b> pour voir les produits offerts gratuitement chez certains vendeurs partenaires.<div style="margin-top:8px"><button class="btn btn-success btn-sm" onclick="useGiftCode()">🎁 Utiliser un code cadeau</button></div></div>`:''}
+  ${rec.length?`<h3 style="margin-top:0">✨ Recommandés pour vous</h3><div class="h-scroll">${rec.map(card).join('')}</div>`:''}
+    <h3>${q?'Résultats':'Produits récents'}</h3>${videoFeedHTML(list,vids)}
+    <p class="muted" style="text-align:center">${DB.status()}</p>`;
+};
+R.categories=()=>`<h2>Catégories</h2><div class="categories-grid">${CATS.map(([n,i])=>`<div class="category-card" onclick="go('category','${n}')"><div class="category-icon">${i}</div><div class="category-name">${n}</div></div>`).join('')}</div>`;
+R.category=a=>{
+  const [n,sub]=String(a).split('|'),chip=(l,t)=>`<button class="btn btn-sm ${(sub||'')===t?'btn-primary':'btn-secondary'}" style="margin:0 6px 6px 0" onclick="go('category','${n}${t?'|'+t:''}',true)">${l}</button>`;
+  return `<div class="row"><h2>${esc(n)}</h2>${backBtn}</div><div style="margin-bottom:8px">${chip('Tout','')}${(SUBS[n]||[]).map(x=>chip(x,x)).join('')}</div>
+  <div class="grid">${vis().filter(p=>p.category.includes(n)&&(!sub||p.sub===sub)).map(card).join('')||'<p class="muted">Aucun produit ici</p>'}</div>`};
+R.favs=()=>{const f=favs();return `<h2>❤️ Mes favoris</h2><div class="grid">${vis().filter(p=>f.has(p.id)).map(card).join('')||'<p class="muted">Aucun favori. Touchez 🤍 sur un produit.</p>'}</div>`};
+R.sellerShop=id=>{
+  const s=sellers()[id];if(!s)return backBtn+'<p>Vendeur introuvable</p>';
+  const ps=vis().filter(p=>p.sellerId===id);
+  return `<div class="row"><h2>${esc(s.name)}</h2>${backBtn}</div>
+  <div class="card"><div class="muted">📍 ${sellerAddrHTML(id)}</div></div>
+  <button class="btn btn-secondary btn-sm" onclick="openReport('seller','${id}')">🚩 Signaler ce vendeur</button>
+  <h3>Produits de ${esc(s.name)} (${ps.length})</h3>
+  <div class="grid">${ps.map(card).join('')||'<p class="muted">Aucun produit publié pour le moment</p>'}</div>`;
+};
+R.referralInfo=()=>{
+  return `<div class="row"><h2>ℹ️ Comment fonctionne le parrainage</h2>${backBtn}</div>
+  <div class="card" style="background:var(--soft);border-left:4px solid var(--blue)">
+    <h3 style="margin-top:0">🎁 Gagnez de l'argent en invitant</h3>
+    <p>Partagez votre code de parrainage <b>5 lettres</b> et recevez une récompense quand quelqu'un l'utilise.</p>
+  </div>
+  <h4>📌 Inviter un CLIENT</h4>
+  <div class="card">
+    <div style="margin:12px 0"><b>✓ Vous gagnez : ${Rs(REWARD_CLIENT)}</b></div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--blue);color:#fff">1️⃣ Étape 1</span> Le client utilise votre code à son inscription</div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--blue);color:#fff">2️⃣ Étape 2</span> <b>${Rs(REWARD_CLIENT)}</b> est mis en attente sur votre compte</div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--green);color:#fff">3️⃣ Étape 3</span> Le client valide son 1er achat ✓ Vous recevez ${Rs(REWARD_CLIENT)} !</div>
+    <div style="margin:8px 0;color:var(--red)"><b>⚠️ Si le client n'achète pas :</b> La récompense disparaît.</div>
+  </div>
+  <h4>📌 Inviter un VENDEUR</h4>
+  <div class="card">
+    <div style="margin:12px 0"><b>✓ Vous gagnez : ${Rs(REWARD_SELLER)}</b></div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--orange);color:#fff">1️⃣ Étape 1</span> Le vendeur utilise votre code à son inscription</div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--orange);color:#fff">2️⃣ Étape 2</span> <b>${Rs(REWARD_SELLER)}</b> est mis en attente sur votre compte</div>
+    <div style="margin:8px 0"><span class="pill" style="background:var(--orange);color:#fff">3️⃣ Étape 3</span> Le vendeur valide ses commissions ✓ Vous recevez ${Rs(REWARD_SELLER)} !</div>
+    <div style="margin:8px 0;color:var(--red)"><b>⚠️ Si 2 mois passent :</b> La récompense disparaît automatiquement.</div>
+  </div>
+  <h4>💰 Retirer vos gains</h4>
+  <div class="card">
+    <p>Quand vous avez des récompenses disponibles, vous pouvez demander le paiement à l'admin :</p>
+    <ol style="margin-left:20px">
+      <li>Allez à <b>Menu › Parrainage</b></li>
+      <li>Entrez votre <b>numéro de téléphone</b></li>
+      <li>L'admin vous contacte et vous paie par <b>Juice</b></li>
+      <li>Il marque votre solde comme payé ✓</li>
+    </ol>
+  </div>
+  <div class="alert alert-info" style="margin-top:16px">💡 <b>Conseil :</b> Plus vous invitez, plus vous gagnez ! Partagez votre code avec vos amis et famille.</div>`;
+};
+R.sellerTerms=()=>{
+  return `<div class="row"><h2>📋 Conditions Vendeur</h2>${backBtn}</div>
+  <div class="alert alert-warning">Avant de vous inscrire, lisez et acceptez ces conditions pour comprendre comment fonctionnent les commissions et paiements.</div>
+  <h3>💼 Comment fonctionnent les commissions</h3>
+  <div class="card">
+    <p><b>Taux de commission :</b> <b>${cfg().commRate}%</b> du montant de chaque vente</p>
+    <p><b>Commission maximale :</b> <b>${Rs(cfg().commMax)}</b> par vente</p>
+    <p><b>Exemple :</b> Vous vendez un article <b>${Rs(1000)}</b></p>
+    <div style="background:var(--soft);padding:8px;border-radius:8px;margin:8px 0">
+      Commission = ${Rs(1000)} × ${cfg().commRate}% = <b>${Rs(1000*cfg().commRate/100)}</b>
+    </div>
+  </div>
+  <h3>🔄 Cycle de paiement des commissions</h3>
+  <div class="card">
+    <div style="margin:12px 0"><b>État 1 : DUE (Due)</b><br>Après chaque vente, la commission est calculée et marquée <span class="pill" style="background:var(--red)">DUE</span></div>
+    <div style="margin:12px 0"><b>État 2 : PENDING (En vérification)</b><br>Vous devez envoyer une preuve de paiement à l'admin. La commission reste en attente.</div>
+    <div style="margin:12px 0"><b>État 3 : PAID (Payée)</b><br>L'admin approuve votre preuve. La commission devient <span class="pill" style="background:var(--green)">PAID</span></div>
+  </div>
+  <h3>⚠️ Paiement obligatoire</h3>
+  <div class="alert alert-error">
+    <b>Attention !</b> Vous DEVEZ payer votre commission à l'admin par Juice :<br>
+    ✓ Payez l'admin<br>
+    ✓ Envoyez la capture d'écran du paiement<br>
+    ✓ Si vous ne payez pas → Votre compte sera bloqué et vos produits masqués
+  </div>
+  <h3>🎁 Déductions possibles</h3>
+  <div class="card">
+    <p><b>Cadeaux gratuits (code MUBAZ)</b></p>
+    <div style="background:var(--soft);padding:8px;border-radius:8px;margin:8px 0">
+      Si vous offrez un produit gratuit en utilisant le code ${GIFT_CODE}, son prix est <b>déduit de votre commission due</b>.
+    </div>
+    <p style="margin-top:12px"><b>Promotions clients (code PROMO)</b></p>
+    <div style="background:var(--soft);padding:8px;border-radius:8px;margin:8px 0">
+      Si le code de promotion est actif, <b>${getPromoDiscount()}% de réduction</b> est appliqué au client et déduit de <b>votre commission</b> (seulement si vous avez une commission impayée).
+    </div>
+  </div>
+  <h3>✅ Déblocage du compte</h3>
+  <div class="card">
+    <p>Si votre compte est bloqué, vous pouvez le débloquer en :</p>
+    <ol style="margin-left:20px">
+      <li>Payant la commission à l'admin par Juice</li>
+      <li>Envoyant la capture d'écran du paiement</li>
+      <li>L'admin vérifie et approuve → Compte débloqué ✓</li>
+    </ol>
+  </div>
+  <div class="alert alert-success" style="margin-top:16px">💡 <b>En résumé :</b> Vendre, payer rapidement, envoyer la preuve, et vous restez actif!</div>`;
+};
+R.giftCatalog=()=>{
+  const list=giftEligible();
+  return `<div class="row"><h2>🎁 Cadeaux gratuits</h2>${backBtn}</div>
+  <p class="muted">Ces produits sont offerts gratuitement par des vendeurs partenaires avec le code <b>${GIFT_CODE}</b>. Rendez-vous chez le vendeur, présentez ce code, et repartez avec votre cadeau !</p>
+  <div class="grid">${list.map(p=>`<div class="product-card" onclick="go('product','${p.id}')">
+    <div class="product-image">${img(p.image)}</div>
+    <div class="product-name">${esc(p.name)}</div>
+    <div class="product-category">${esc(sName(p.sellerId))}</div>
+    <div class="muted">${sellerAddrHTML(p.sellerId)}</div>
+    <div class="product-price" style="color:var(--green)">🎁 Gratuit avec le code ${GIFT_CODE} <span class="muted" style="text-decoration:line-through">${Rs(p.price)}</span></div></div>`).join('')||'<p class="muted">Aucun cadeau disponible pour le moment.</p>'}</div>`;
+};
+R.product=id=>{
+  const p=DB.get('products')[id];if(!p)return backBtn+'<p>Produit introuvable</p>';
+  const mine=(DB.get('ratings')[id]||{})[cid],rl=rats(id).sort((a,b)=>b.ts-a.ts).slice(0,5),rec=recos(p.category,[id],4).filter(x=>x.category===p.category||true),pcode=codeOf(id);
+  return `${backBtn}<div style="text-align:center;margin-top:14px"><div class="product-image" id="pimg-box" style="max-height:300px;font-size:96px;margin:0 auto">${img(DB.mem['pimg/'+id]||p.image)}</div>
+    <h2>${esc(p.name)}</h2>${p.sizes&&p.sizes.length?`<div style="margin:8px 0">${p.sizes.map(x=>`<span class="pill" style="background:var(--navy);margin-right:6px">${x}</span>`).join('')}</div>`:''}<p class="muted">${esc(p.category)}${p.sub?' › '+esc(p.sub):''} · Vendeur : ${esc(sName(p.sellerId))}</p><p>${esc(p.desc)}</p>
+    <p class="muted">🔑 Code produit : <b>${pcode}</b></p>
+    <p><button class="btn btn-primary btn-sm" onclick="shareProduct('${id}')">📤 Partager ce produit</button></p>
+    <p><button class="btn btn-secondary btn-sm" onclick="openReport('product','${id}')">🚩 Signaler ce produit</button> <button class="btn btn-secondary btn-sm" onclick="openReport('seller','${p.sellerId}')">🚩 Signaler le vendeur</button></p>
+    <div style="font-size:24px;color:var(--green);margin:10px 0">${Rs(p.price)}</div><div>${starsHTML(id)}</div>
+    <div class="row" style="margin-top:14px"><button class="btn btn-primary" style="flex:1" onclick="addCart('${id}')">Ajouter au Panier</button>
+    <button class="btn btn-secondary" onclick="toggleFav('${id}')">${favs().has(id)?'❤️':'🤍'}</button></div></div>
+    <h3>Votre note</h3><div>${[1,2,3,4,5].map(n=>`<button class="star-btn ${mine&&n<=mine.stars?'on':''}" onclick="rate('${id}',${n})">★</button>`).join('')}</div>
+    ${rl.map(r=>`<div class="muted">★ ${r.stars} — ${esc(r.name)}</div>`).join('')}
+    <h3>Vous aimerez aussi</h3><div class="h-scroll">${rec.map(card).join('')}</div>`;
+};
+R.cart=()=>{
+  const c=cart(),P=DB.get('products'),gs=groups();
+  if(!gs.length)return '<h2>Panier</h2><p style="text-align:center" class="muted">Votre panier est vide</p>';
+  const lines=c.filter(i=>P[i.id]).map(i=>{const p=P[i.id];return `<div class="card"><div class="row"><div class="row" style="justify-content:flex-start"><div class="thumb">${img(p.image)}</div><div>
+    <b>${esc(p.name)}</b><div class="muted">${esc(sName(p.sellerId))}</div><div style="color:var(--green)">${Rs(p.price)} × ${i.qty}</div></div></div>
+    <button class="btn btn-danger btn-sm" onclick="delCart('${i.id}')">✕</button></div>
+    <div style="margin-top:8px"><button class="btn btn-secondary btn-sm" onclick="qty('${i.id}',-1)">−</button> <b style="margin:0 8px">${i.qty}</b> <button class="btn btn-secondary btn-sm" onclick="qty('${i.id}',1)">+</button></div></div>`}).join('');
+  const tot=gs.reduce((a,g)=>a+g.total,0);
+  const disc=calculatePromoDiscount(c);
+  const finalTot=tot-disc;
+  return `<h2>Panier</h2>${lines}<div class="payment-box">${gs.map(g=>`<div class="payment-item"><span>${esc(sName(g.sid))} <span class="muted">(livraison choisie au paiement)</span></span><span>${Rs(g.sub)}</span></div>`).join('')}
+    <div class="payment-item"><span>Montant total</span><span>${Rs(tot)}</span></div>
+    ${promoActive()?`<div class="payment-item"><span>🏷️ Appliquer un code de réduction</span><span style="color:var(--blue)"><button class="btn btn-link" style="padding:0;text-decoration:underline" onclick="usePromoCode()">Appliquer</button></span></div>`:''}
+    ${disc>0?`<div class="payment-item"><span style="color:var(--red)">Réduction appliquée</span><span style="color:var(--red)">−${Rs(disc)}</span></div>`:''}
+    <div class="payment-total"><span>Sous-total</span><span>${Rs(finalTot)}</span></div></div>
+    ${gs.length>1?`<div class="alert alert-warning">ℹ️ ${gs.length} vendeurs : un paiement Juice par vendeur.</div>`:''}
+    <button class="btn btn-primary" style="width:100%" onclick="go('payment')">Continuer la commande</button>`;
+};
+R.payment=()=>{
+  PAYSHIP={};const gs=groups();if(!gs.length)return '<p>Panier vide</p>'+backBtn;
+  return `<h2>Paiement</h2><div class="alert alert-warning">ℹ️ Payez chaque vendeur par Juice, puis ajoutez la capture d'écran correspondante.</div>
+  <form onsubmit="placeOrders(event)">
+    <div class="form-group"><label>Votre Nom</label><input id="b-name" required value="${esc(LS.get('MB_NAME',''))}"></div>
+    <div class="form-group"><label>Votre Numéro de Téléphone</label><input id="b-phone" type="tel" required value="${esc(LS.get('MB_PHONE',''))}" placeholder="Entrez votre numéro"></div>
+    <div class="card"><b>📍 Adresse pour récupérer votre colis</b>
+      <div class="form-group"><label>District</label><select id="b-dist" required><option value="">Choisir le district</option>${DISTRICTS.map(d=>`<option ${d===LS.get('MB_ADDR',{}).district?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Adresse complète (rue, numéro, village)</label><input id="b-street" required value="${esc(LS.get('MB_ADDR',{}).street||'')}"></div>
+      <div class="form-group"><label>Repère / indications (facultatif)</label><input id="b-note" value="${esc(LS.get('MB_ADDR',{}).note||'')}" placeholder="Ex : près de la pharmacie, portail bleu"></div></div>
+    ${gs.map(g=>`<div class="card"><b>${esc(sName(g.sid))}</b>
+      <div class="form-group"><label>Numéro Juice du Vendeur</label><input readonly value="${esc(g.sid)}" style="background:var(--soft)"></div>
+      <div class="form-group"><label>Mode de réception</label>
+        <label style="display:block;margin:4px 0"><input type="radio" name="mode_${g.sid}" value="post" checked onchange="setShipMode('${g.sid}','post')"> 🚚 Postage (livraison à domicile) — ${Rs(sellerShip(g.sid))}</label>
+        <label style="display:block;margin:4px 0"><input type="radio" name="mode_${g.sid}" value="pickup" onchange="setShipMode('${g.sid}','pickup')"> 🏬 Pick-up (retrait chez le vendeur) — Gratuit</label></div>
+      <div class="muted hidden" id="pickupaddr-${g.sid}">${sellerAddrHTML(g.sid)}</div>
+      <div class="payment-item"><span>Montant</span><span>${Rs(g.sub)}</span></div>
+      <div class="payment-item" id="shiprow-${g.sid}"><span>Livraison</span><span id="shipval-${g.sid}">${Rs(g.ship)}</span></div>
+      <div class="payment-total"><span>Total à Payer</span><span id="total-${g.sid}">${Rs(g.total)}</span></div>
+      <div class="form-group" style="margin-top:10px"><label>Preuve de Paiement (Capture d'écran)</label><input type="file" id="pf_${g.sid}" accept="image/*" required></div></div>`).join('')}
+    ${gs.length>1?`<div class="payment-box"><div class="payment-total"><span>Total général</span><span id="grand-total">${Rs(gs.reduce((a,g)=>a+g.total,0))}</span></div></div>`:''}
+    <button id="pay-btn" type="submit" class="btn btn-success" style="width:100%">Valider les Paiements</button>
+    <button type="button" class="btn btn-secondary" onclick="back()" style="width:100%;margin-top:10px">Retour</button>
+  </form>`;
+};
+R.myorders=()=>{const l=DB.list('orders').filter(o=>o.clientId===cid).sort((a,b)=>b.ts-a.ts);return `<h2>Mes commandes</h2>${l.map(o=>orderCard(o,'buyer')).join('')||'<p class="muted">Aucune commande</p>'}`};
+R.notifs=()=>`<h2>🔔 Notifications</h2>${myNotifs().map(n=>`<div class="card"><b>${esc(n.title)}</b><div>${esc(n.body)}</div><div class="muted">${new Date(n.ts).toLocaleString('fr-MU')}</div></div>`).join('')||'<p class="muted">Aucune notification</p>'}`;
+R.referral=()=>{
+  ensureClient();const cl=DB.get('clients')[cid]||{},bal=myReward('c:'+cid),hist=(DB.get('rewards')['c:'+cid]||{}).history||[];
+  return `<div class="row"><h2>🎁 Parrainage</h2>${backBtn}</div>
+  <div class="card" style="background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;border:0">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:16px">Gagnez en invitant</b><div style="margin-top:4px;opacity:0.9">Partagez votre code et gagnez</div></div>
+    <button class="btn btn-sm btn-light" onclick="go('referralInfo')" style="background:#fff;color:var(--blue);font-weight:bold">ℹ️ Comment ça marche ?</button></div>
+  </div>
+  <div class="alert alert-warning">💰 <b>Client</b> : +${Rs(REWARD_CLIENT)} dès son 1er achat validé<br>💰 <b>Vendeur</b> : +${Rs(REWARD_SELLER)} dès son inscription</div>
+  <div class="card"><b>Mon code de parrainage (5 lettres)</b>
+    <div class="row" style="margin-top:8px"><input readonly value="${generateReferralCode(cid)}" style="background:var(--soft);flex:1;font-weight:bold;font-size:16px;text-align:center" onclick="navigator.clipboard.writeText(generateReferralCode(cid)).then(()=>toast('✅ Code copié'))"><button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(generateReferralCode(cid)).then(()=>toast('✅ Code copié'))">Copier</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn btn-primary btn-sm" style="flex:1" onclick="shareApp('client')">📤 Inviter client</button><button class="btn btn-secondary btn-sm" style="flex:1" onclick="shareApp('seller')">📤 Inviter vendeur</button></div></div>
+  <div class="card"><b>💰 Solde disponible</b><div style="font-size:24px;color:var(--green);margin-top:8px;font-weight:bold">${Rs(bal)}</div>
+    <p class="muted" style="margin-top:8px;font-size:13px">En attente de validation ou disponible</p>
+    <div class="form-group" style="margin-top:10px"><label>Numéro de téléphone (paiement)</label><input id="ref-phone" value="${esc(cl.phone||LS.get('MB_PHONE',''))}"></div>
+    <button class="btn btn-secondary btn-sm" onclick="saveClientPhone()">Enregistrer</button>
+    <p class="muted" style="margin-top:8px">L'admin vous paie par Juice une fois votre demande approuvée.</p></div>
+  ${cl.referredBy?`<div class="alert alert-success">✅ Code parrain : <b>${esc(cl.referredBy)}</b></div>`
+    :`<div class="card"><b>Vous avez un code de parrainage ?</b><form onsubmit="submitReferral(event)">
+    <div class="form-group" style="margin-top:8px"><input id="ref-code" placeholder="Entrez le code (5 lettres)" required></div>
+    <button class="btn btn-success" style="width:100%">✓ Valider</button></form></div>`}
+  <h3>Historique</h3>${hist.slice().reverse().map(h=>`<div class="card row"><div><b style="color:${h.amount<0?'var(--red)':'var(--green)'}">${h.amount<0?'':'+'}${Rs(h.amount)}</b><div class="muted" style="font-size:12px">${esc(h.reason)}</div></div><div class="muted" style="font-size:12px;text-align:right">${new Date(h.ts).toLocaleDateString('fr-MU')}</div></div>`).join('')||'<p class="muted">Aucun mouvement</p>'}`;
+};
+function generateReferralCode(id){
+  /* Convertit un ID numérique en code 5 lettres constant */
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let code='';let num=id.replace(/\D/g,'');
+  num=String(parseInt(num.slice(-9))||0).padStart(9,'0');
+  for(let i=0;i<5;i++){code+=letters[parseInt(num.slice(i*2,i*2+2))%26]}
+  return code;
+}
+function findReferrerByCode(code){
+  /* Cherche l'utilisateur correspondant au code 5 lettres */
+  code=(code||'').trim().toUpperCase();if(!code||code.length!==5)return null;
+  const clients=DB.get('clients'),sellers=DB.get('sellers');
+  for(const[id,c] of Object.entries(clients||{})){if(generateReferralCode(id)===code)return{key:'c:'+id,type:'Client'}}
+  for(const[id,s] of Object.entries(sellers||{})){if(generateReferralCode(id)===code)return{key:'s:'+id,type:'Vendeur'}}
+  return null;
+}
+function saveClientPhone(){const v=$('#ref-phone').value.trim();if(!v)return toast('Numéro requis');ensureClient();DB.set('clients/'+cid+'/phone',v);LS.set('MB_PHONE',v);toast('✅ Numéro enregistré')}
+function submitReferral(e){
+  e.preventDefault();ensureClient();const cl=DB.get('clients')[cid]||{};if(cl.referredBy)return toast('Parrainage déjà enregistré');
+  const code=$('#ref-code').value.trim().toUpperCase();if(code.length!==5)return toast('Code invalide (5 lettres)');
+  const r=findReferrerByCode(code);if(!r)return toast('Code inexistant');
+  DB.set('clients/'+cid+'/referredBy',code);DB.set('clients/'+cid+'/referrerKey',r.key);
+  toast('✅ Parrainage enregistré ! Votre parrain gagnera '+Rs(REWARD_CLIENT)+' dès votre premier achat validé.');render();
+}
+
+/* --- Espace vendeur (privé : connexion par Juice + code) --- */
+R.seller=()=>me()?R.sellerHome():`<h2>Espace Vendeur</h2>
+  <div class="card"><h3 style="margin-top:0">Connexion</h3><form onsubmit="login(event)">
+    <div class="form-group"><label>Numéro Juice</label><input id="l-juice" type="tel" required></div>
+    <div class="form-group"><label>Code secret</label><input id="l-pin" type="password" required></div>
+    <button class="btn btn-primary" style="width:100%">Se connecter</button></form></div>
+  <div class="card"><h3 style="margin-top:0">Devenir vendeur</h3><form onsubmit="register(event)">
+    <div class="form-group"><label>Nom de la boutique</label><input id="r-name" required></div>
+    <div class="form-group"><label>Numéro Juice (reçoit vos paiements)</label><input id="r-juice" type="tel" required></div>
+    <div class="form-group"><label>Code secret (4 chiffres min.)</label><input id="r-pin" type="password" minlength="4" required></div>
+    <div class="form-group"><label>Code de parrainage (facultatif)</label><input id="r-ref" placeholder="Code d'un client ou vendeur"></div>
+    <div class="form-group"><label>Carte d'identité (photo) *</label>
+      <input type="file" id="r-id-cam" accept="image/*" capture="environment" style="display:none" onchange="idPicked(this)">
+      <input type="file" id="r-id-gal" accept="image/*" style="display:none" onchange="idPicked(this)">
+      <div class="row"><button type="button" class="btn btn-secondary" style="flex:1" onclick="$('#r-id-cam').click()">📷 Prendre une photo</button><button type="button" class="btn btn-secondary" style="flex:1" onclick="$('#r-id-gal').click()">🖼️ Galerie</button></div>
+      <div id="r-id-status" class="muted" style="margin-top:6px">Aucune photo ajoutée</div>
+      <div class="muted">Utilisée par l'administrateur pour vérifier votre identité.</div></div>
+    <div style="background:var(--soft);padding:10px;border-radius:8px;margin:12px 0">
+      <div style="margin-bottom:8px"><b>📋 Conditions importantes</b></div>
+      <p style="margin:6px 0;font-size:13px">Commission : <b>${cfg().commRate}%</b> du montant (max <b>${Rs(cfg().commMax)}</b> par vente)<br>
+      Vous DEVEZ payer l'admin rapidement après chaque vente ou votre compte sera bloqué.</p>
+      <button type="button" class="btn btn-link" style="padding:0;text-decoration:underline;font-size:13px" onclick="go('sellerTerms')">📖 Lire les conditions complètes</button>
+    </div>
+    <label style="display:flex;align-items:flex-start;gap:8px;margin:12px 0;cursor:pointer">
+      <input type="checkbox" id="r-agree" required style="margin-top:4px">
+      <span style="font-size:13px">J'accepte les <a style="color:var(--blue);text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();go('sellerTerms')">conditions</a> et comprends comment fonctionnent les commissions et les paiements</span>
+    </label>
+    <button class="btn btn-success" style="width:100%">✓ Créer mon espace</button></form></div>`;
+function login(e){e.preventDefault();const id=norm($('#l-juice').value),s=sellers()[id];
+  if(!s||s.pin!==H($('#l-pin').value))return toast('Numéro ou code incorrect');
+  LS.set('MB_SESS',{id});toast('Bienvenue '+s.name);askPushOnce();go('seller')}
+let ID_FILE=null;
+function idPicked(el){ID_FILE=el.files[0]||null;$('#r-id-status').textContent=ID_FILE?'✅ Photo ajoutée : '+ID_FILE.name:'Aucune photo ajoutée'}
+async function register(e){
+  e.preventDefault();const id=norm($('#r-juice').value);
+  if(id.length<7)return toast('Numéro Juice invalide');if(sellers()[id])return toast('Ce numéro est déjà inscrit');
+  if(!ID_FILE)return toast('📷 Ajoutez la photo de votre carte d\'identité');
+  if(!$('#r-agree').checked)return toast('❌ Vous devez accepter les conditions');
+  toast('Envoi en cours…');const idPhoto=await photo(ID_FILE,900,.65);
+  DB.set('sellers/'+id,{id,name:$('#r-name').value.trim(),pin:H($('#r-pin').value),blocked:false,hasId:true,ship:cfg().ship,ts:Date.now()});
+  DB.set('kyc/'+id,idPhoto);ID_FILE=null;
+  const refCode=$('#r-ref').value.trim();
+  if(refCode&&refCode!==id){const r=findReferrer(refCode);if(r){DB.set('sellers/'+id+'/referredBy',refCode);creditReward(r.key,REWARD_SELLER,'A invité un nouveau vendeur ('+$('#r-name').value.trim()+')')}else toast('⚠️ Code de parrainage invalide, ignoré')}
+  LS.set('MB_SESS',{id});toast('✅ Espace créé');askPushOnce();go('seller');
+}
+function sellerSetShip(){
+  const s=me();if(!s)return;const v=prompt('Frais de livraison / Postage (Rs) pour vos colis',sellerShip(s.id));if(v===null)return;
+  const n=parseFloat(v);if(isNaN(n)||n<0)return toast('Montant invalide');
+  DB.set('sellers/'+s.id+'/ship',n);toast('✅ Frais de livraison mis à jour ('+Rs(n)+')');
+}
+function openSellerAddress(){
+  const s=me();if(!s)return;const a=s.address||{};
+  $('#sa-dist').innerHTML='<option value="">Choisir le district</option>'+DISTRICTS.map(d=>`<option ${d===a.district?'selected':''}>${d}</option>`).join('');
+  $('#sa-street').value=a.street||'';$('#sa-note').value=a.note||'';
+  $('#seller-address-modal').classList.add('active');
+}
+function saveSellerAddress(e){
+  e.preventDefault();const s=me();if(!s)return;
+  const address={district:$('#sa-dist').value,street:$('#sa-street').value.trim(),note:$('#sa-note').value.trim()};
+  DB.set('sellers/'+s.id+'/address',address);closeModal('seller-address-modal');toast('✅ Adresse de retrait enregistrée');
+}
+const sellerAddrHTML=id=>{const a=(sellers()[id]||{}).address;
+  return a&&a.street?`📍 ${esc(a.street)}, ${esc(a.district)}${a.note?' ('+esc(a.note)+')':''}`:'⚠️ Adresse non définie par le vendeur — contactez-le par téléphone.';
+};
+const pickupAddrLine=o=>{
+  if(o.pickupAddress&&o.pickupAddress.street)return `<div class="muted">📍 Retrait chez le vendeur : ${esc(o.pickupAddress.street)}, ${esc(o.pickupAddress.district)}${o.pickupAddress.note?' ('+esc(o.pickupAddress.note)+')':''}</div>`;
+  return `<div class="muted">⚠️ Adresse de retrait non fournie — contactez le vendeur.</div>`;
+};
+const idBanner=()=>`<div class="alert alert-warning">🪪 Ajoutez la photo de votre carte d'identité pour vérifier votre compte.<div class="row" style="margin-top:8px">
+  <label class="btn btn-secondary btn-sm" style="flex:1;text-align:center">📷 Photo<input type="file" accept="image/*" capture="environment" style="display:none" onchange="uploadId(this)"></label>
+  <label class="btn btn-secondary btn-sm" style="flex:1;text-align:center">🖼️ Galerie<input type="file" accept="image/*" style="display:none" onchange="uploadId(this)"></label></div></div>`;
+async function uploadId(inp){const s=me(),f=inp.files[0];if(!s||!f)return;toast('Envoi…');
+  DB.set('kyc/'+s.id,await photo(f,900,.65));DB.set('sellers/'+s.id+'/hasId',true);toast('✅ Pièce envoyée')}
+async function showKyc(id,btn){if(!isAdm())return;btn.disabled=true;btn.textContent='Chargement…';const d=await DB.blob('kyc/'+id);
+  if(!d){btn.disabled=false;btn.textContent='Introuvable — réessayer';return}
+  btn.outerHTML=`<a href="${d}" target="_blank"><img class="proof" src="${d}"></a>`}
+function logout(){LS.set('MB_SESS',null);go('seller')}
+function askPushOnce(){if(window.Notification&&Notification.permission==='default')askPush()}
+const due=id=>DB.list('orders').filter(o=>o.sellerId===id&&o.commStatus==='DUE');
+R.sellerHome=()=>{
+  const s=me();if(!s)return R.seller();
+  const os=DB.list('orders').filter(o=>o.sellerId===s.id),pend=os.filter(o=>o.status==='PENDING').length,d=netDue(s.id),mine=DB.list('products').filter(p=>p.sellerId===s.id);
+  return `<div class="row"><h2>${esc(s.name)}</h2><button class="btn btn-secondary btn-sm" onclick="logout()">Déconnexion</button></div>
+  ${s.blocked?'<div class="alert alert-error">⛔ Compte bloqué : vos produits sont masqués. Payez votre commission pour être débloqué.</div>':''}${s.hasId?'':idBanner()}${(!s.address||!s.address.street)?'<div class="alert alert-warning">📍 Ajoutez votre adresse de retrait (pick-up) pour que les clients sachent où venir chercher leurs commandes.<div style="margin-top:8px"><button class="btn btn-secondary btn-sm" onclick="openSellerAddress()">Ajouter mon adresse</button></div></div>':''}${commWarn(s,d)}
+  <div class="stats"><div class="stat" style="background:var(--orange)"><b>${pend}</b><span>Paiements à vérifier</span></div>
+  <div class="stat" style="background:var(--green)"><b>${mine.length}</b><span>Produits publiés</span></div>
+  <div class="stat" style="background:var(--blue)"><b>${os.filter(o=>o.status==='APPROVED').length}</b><span>Ventes validées</span></div>
+  <div class="stat" style="background:var(--red)"><b>${Rs(d)}</b><span>Commission à payer</span></div>
+  <div class="stat" style="background:var(--navy)"><b>${mine.reduce((a,p)=>a+viewsToday(p),0)}</b><span>👁️ Vues produits aujourd'hui</span></div></div>
+  <div class="card row"><span>📦 Frais de livraison (Postage) : <b>${Rs(sellerShip(s.id))}</b></span><button class="btn btn-secondary btn-sm" onclick="sellerSetShip()">Modifier</button></div>
+  <div class="card row"><span>📍 Adresse de retrait (Pick-up) : <b>${sellerAddrHTML(s.id)}</b></span><button class="btn btn-secondary btn-sm" onclick="openSellerAddress()">Modifier</button></div>
+  <div class="card row"><span>🎁 Solde de parrainage : <b>${Rs(myReward('s:'+s.id))}</b> <span class="muted">(déduit de votre commission)</span></span><button class="btn btn-secondary btn-sm" onclick="shareApp('seller')">📤 Inviter (+${Rs(REWARD_SELLER)})</button></div>
+  <div class="row"><button class="btn btn-primary" style="flex:1" onclick="openAdd()" ${s.blocked?'disabled':''}>+ Produit</button>
+  <button class="btn btn-secondary" style="flex:1" onclick="go('sellerOrders')">📋 Commandes</button>
+  <button class="btn btn-secondary" style="flex:1" onclick="go('sellerComm')">💰 Commission</button></div>
+  ${sellerVideoBlockHTML(s)}
+  <h3>Mes Produits</h3><p class="muted" style="margin-top:-6px;font-size:12px">👁️ Les vues affichées sont celles d'aujourd'hui — remises à zéro chaque jour (toutes les 24h).</p><div class="grid">${mine.map(p=>`<div><div class="product-card"><div class="product-image">${img(p.image)}</div><div class="product-name">${esc(p.name)}</div><div class="product-category">${esc(p.sub||p.category)}</div><div class="product-price" id="pv-${p.id}">${Rs(p.price)}</div>${p.sizes&&p.sizes.length?`<div class="muted">${p.sizes.join(', ')}</div>`:''}<div class="muted" style="font-size:12px">👁️ ${viewsToday(p)} vue${viewsToday(p)>1?'s':''} aujourd'hui</div></div>
+  <div class="row" style="margin-top:5px"><button class="btn btn-secondary btn-sm" style="flex:1" onclick="editPrice('${p.id}')">✏️ Prix</button>
+  <button class="btn btn-danger btn-sm" style="flex:1" onclick="delProduct('${p.id}')">Supprimer</button></div></div>`).join('')||'<p class="muted">Aucun produit publié</p>'}</div>`;
+};
+R.sellerOrders=()=>{const s=me();if(!s)return R.seller();
+  const l=DB.list('orders').filter(o=>o.sellerId===s.id).sort((a,b)=>b.ts-a.ts);
+  return `<div class="row"><h2>Mes Commandes</h2>${backBtn}</div>${l.map(o=>orderCard(o,'seller')).join('')||'<p class="muted">Aucune commande</p>'}`};
+R.sellerComm=()=>{
+  const s=me();if(!s)return R.seller();
+  const dl=due(s.id),gross=dl.reduce((a,o)=>a+o.commission,0),avail=myReward('s:'+s.id),d=netDue(s.id),pays=DB.list('commPay').filter(c=>c.sellerId===s.id).sort((a,b)=>b.ts-a.ts),j=cfg().juice;
+  return `<div class="row"><h2>Ma Commission</h2>${backBtn}</div>
+  ${s.blocked?'<div class="alert alert-error">⛔ Compte bloqué. Payez votre commission pour être débloqué.</div>':''}${commWarn(s,d)}<p class="muted">${cfg().commRate}% du montant de chaque vente validée (maximum ${Rs(cfg().commMax)} par vente), à payer à l'admin par Juice.</p>
+  <div class="payment-box"><div class="payment-item"><span>Ventes non réglées</span><span>${dl.length}</span></div>
+  <div class="payment-item"><span>Commission brute</span><span>${Rs(gross)}</span></div>
+  <div class="payment-item"><span>🎁 Solde de parrainage</span><span>−${Rs(Math.min(avail,gross))}</span></div>
+  <div class="payment-total"><span>Net à payer</span><span>${Rs(d)}</span></div></div>
+  ${(()=>{const mine=giftEligible().filter(p=>p.sellerId===s.id);return `<div class="card"><b>🎁 Vos produits éligibles au code ${GIFT_CODE}</b>
+    <p class="muted" style="margin-top:6px">Un client peut venir chercher gratuitement l'un de ces produits en présentant le code ${GIFT_CODE}. Son prix sera alors déduit de votre commission due.</p>
+    ${mine.map(p=>`<div class="card row" style="margin-top:6px"><div><b>${esc(p.name)}</b><div class="muted">${Rs(p.price)}</div></div><button class="btn btn-sm btn-success" onclick="giveGift('${p.id}')">🎁 Cadeau donné</button></div>`).join('')||'<p class="muted">Aucun produit à vous n\'est actuellement éligible (le prix doit être ≤ à votre commission due).</p>'}</div>`})()}
+  ${d>0?(j?`<form onsubmit="payComm(event)"><div class="form-group"><label>Numéro Juice de l'Admin</label><input readonly value="${esc(j)}" style="background:var(--soft)"></div>
+    <div class="form-group"><label>Votre Numéro de Téléphone</label><input id="c-phone" type="tel" value="${esc(s.id)}" required></div>
+    <div class="form-group"><label>Preuve de Paiement (Capture d'écran)</label><input id="c-proof" type="file" accept="image/*" required></div>
+    <button id="c-btn" class="btn btn-success" style="width:100%">Payer ma commission (${Rs(d)})</button></form>`:'<div class="alert alert-warning">L\'admin n\'a pas encore défini son numéro Juice.</div>'):(gross>0?'<div class="alert alert-success">✅ Entièrement couverte par votre solde de parrainage.</div>':'<div class="alert alert-success">✅ Aucune commission à payer.</div>')}
+  <h3>Historique</h3>${pays.map(c=>`<div class="card row"><div><b>${Rs(c.amount)}</b><div class="muted">${new Date(c.ts).toLocaleString('fr-MU')} · ${c.orderIds.length} vente(s)</div></div><span class="pill" style="background:${ST[c.status]?ST[c.status][1]:'#999'}">${ST[c.status]?ST[c.status][0]:c.status}</span></div>`).join('')||'<p class="muted">Aucun paiement</p>'}`;
+};
+async function payComm(e){
+  e.preventDefault();const s=me(),dl=due(s.id);if(!dl.length)return;
+  const gross=dl.reduce((a,o)=>a+o.commission,0),avail=myReward('s:'+s.id),applied=Math.min(avail,gross),amount=gross-applied;
+  if(applied>0)useReward('s:'+s.id,applied,'Déduit de votre commission');
+  if(amount<=0){dl.forEach(o=>DB.set('orders/'+o.id+'/commStatus','PAID'));toast('✅ Commission couverte par votre solde de parrainage');render();return}
+  const f=$('#c-proof').files[0];if(!f)return toast('Ajoutez la preuve de paiement');
+  const b=$('#c-btn');b.disabled=true;b.textContent='Envoi...';
+  const proof=await photo(f,800,.6),id='cp'+uid();
+  DB.set('commPay/'+id,{id,sellerId:s.id,amount,rewardApplied:applied,orderIds:dl.map(o=>o.id),phone:$('#c-phone').value,hasProof:true,status:'PENDING',ts:Date.now()});
+  dl.forEach(o=>DB.set('orders/'+o.id+'/commStatus','PENDING'));
+  notify('admin','💰 Commission reçue',`${s.name} — ${Rs(amount)}`);
+  DB.set('proofs/'+id,proof);toast('✅ Paiement envoyé à l\'admin');
+}
+
+/* --- Produits vendeur --- */
+function openAdd(){$('#product-category').innerHTML='<option value="">Sélectionner une catégorie</option>'+CATS.map(c=>`<option>${c[0]}</option>`).join('');
+  $('#product-sizes-group').classList.add('hidden');document.querySelectorAll('.pz-size').forEach(c=>c.checked=false);
+  $('#add-product-modal').classList.add('active')}
+function fillSubs(){
+  $('#product-sub').innerHTML='<option value="">Sélectionner une sous-catégorie</option>'+(SUBS[$('#product-category').value]||[]).map(x=>`<option>${x}</option>`).join('');
+  $('#product-sizes-group').classList.toggle('hidden',$('#product-category').value!=='Mode & Accessoires');
+}
+function closeModal(id){$('#'+id).classList.remove('active')}
+async function addProduct(e){
+  e.preventDefault();const s=me();if(!s||s.blocked)return toast('Compte bloqué');
+  const f=$('#product-image').files[0],b=$('#add-btn');b.disabled=true;
+  const full=await photo(f,800,.7),image=await shrink(full,320,.6),id='p'+uid();
+  const sizes=$('#product-category').value==='Mode & Accessoires'?[...document.querySelectorAll('.pz-size:checked')].map(c=>c.value):[];
+  DB.set('products/'+id,{id,code:genCode(),name:$('#product-name').value.trim(),desc:$('#product-desc').value.trim(),category:$('#product-category').value,sub:$('#product-sub').value,sizes,price:parseFloat($('#product-price').value),image,sellerId:s.id,ts:Date.now()});
+  DB.set('pimg/'+id,full);
+  e.target.reset();b.disabled=false;closeModal('add-product-modal');toast('✅ Produit publié');
+}
+function editPrice(id){
+  const p=DB.get('products')[id],s=me();if(!p||!s||p.sellerId!==s.id)return;
+  const v=prompt('Nouveau prix (Rs) pour « '+p.name+' »',p.price);if(v===null)return;
+  const n=parseFloat(v);if(isNaN(n)||n<=0)return toast('Prix invalide');
+  DB.set('products/'+id+'/price',n);toast('✅ Prix mis à jour ('+Rs(n)+')');
+}
+function delProduct(id){const p=DB.get('products')[id],s=me();if(!p||!s||p.sellerId!==s.id||!confirm('Supprimer ce produit ?'))return;DB.set('products/'+id,null);DB.set('ratings/'+id,null);DB.set('pimg/'+id,null)}
+
+/* --- Vidéo boutique vendeur --- */
+function sellerVideoBlockHTML(s){
+  const v=myVideo(s.id);
+  if(!v)return `<div class="card"><div class="row"><b>🎬 Vidéo boutique</b></div>
+    <p class="muted" style="margin-top:6px">Mettez votre boutique en avant avec une vidéo qui se lit automatiquement sur la page d'accueil. Prix : <b>${Rs(videoPrice())}</b> pour 24 heures. Durée acceptée : de 15 secondes à 1 minute maximum. Fichier léger recommandé (max ${Math.round(VIDEO_MAX_BYTES/1024/1024)} Mo).</p>
+    <button class="btn btn-primary btn-sm" onclick="go('sellerVideoNew')" ${s.blocked?'disabled':''}>🎬 Publier une vidéo</button></div>`;
+  const live=videoIsLive(v),exp=videoExpired(v);
+  const st=v.status==='PENDING'?['En attente de validation','var(--orange)']:v.status==='REJECTED'?['Paiement refusé','var(--red)']:live?['🔴 En ligne','var(--green)']:exp?['Expirée (24h écoulées)','#999']:['—','#999'];
+  return `<div class="card"><div class="row"><b>🎬 Vidéo boutique</b><span class="pill" style="background:${st[1]}">${st[0]}</span></div>
+    <div class="muted" style="margin-top:4px">Durée : ${v.durationSec||'?'}s${live?` · En ligne jusqu'au ${new Date(v.liveAt+VIDEO_DAY_MS).toLocaleString('fr-MU')}`:''}</div>
+    <div class="muted">👁️ ${viewsToday(v)} vue${viewsToday(v)>1?'s':''} aujourd'hui — remis à zéro chaque jour</div>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap">
+      ${exp?`<button class="btn btn-sm btn-success" onclick="go('sellerVideoRenew')">💳 Payer pour réafficher (${Rs(videoPrice())})</button>`:''}
+      ${v.status==='REJECTED'?`<button class="btn btn-sm btn-primary" onclick="go('sellerVideoNew')">🔄 Republier une vidéo</button>`:''}
+      <button class="btn btn-sm btn-danger" onclick="deleteVideo()">🗑️ Supprimer ma vidéo</button>
+    </div></div>`;
+}
+let VID_FILE=null,VID_DUR=null;
+function vidPicked(el){
+  const f=el.files[0];VID_FILE=null;VID_DUR=null;
+  if(!f){$('#sv-status').textContent='Aucune vidéo sélectionnée';return}
+  if(f.size>VIDEO_MAX_BYTES){toast('⚠️ Fichier trop volumineux (max '+Math.round(VIDEO_MAX_BYTES/1024/1024)+' Mo) — compressez la vidéo ou choisissez-en une plus courte/légère');el.value='';$('#sv-status').textContent='Aucune vidéo sélectionnée';return}
+  $('#sv-status').textContent='Lecture de la vidéo…';
+  const url=URL.createObjectURL(f),probe=document.createElement('video');probe.preload='metadata';
+  probe.onloadedmetadata=()=>{
+    URL.revokeObjectURL(url);const dur=probe.duration;
+    if(!isFinite(dur)||dur<=0){toast('⚠️ Impossible de lire la durée de cette vidéo');$('#sv-status').textContent='Aucune vidéo valide sélectionnée';return}
+    if(dur<VIDEO_MIN_SEC){toast('❌ Vidéo refusée : durée minimale '+VIDEO_MIN_SEC+' secondes');$('#sv-status').textContent='❌ Trop courte ('+Math.round(dur)+'s) — minimum '+VIDEO_MIN_SEC+'s';return}
+    if(dur>VIDEO_MAX_SEC+0.9){toast('❌ Vidéo refusée : durée maximale 1 minute (60 secondes)');$('#sv-status').textContent='❌ Trop longue ('+Math.round(dur)+'s) — maximum '+VIDEO_MAX_SEC+'s';return}
+    VID_FILE=f;VID_DUR=Math.round(dur);$('#sv-status').textContent='✅ Vidéo sélectionnée — durée : '+VID_DUR+'s';
+  };
+  probe.onerror=()=>{toast('⚠️ Fichier vidéo invalide');$('#sv-status').textContent='Aucune vidéo valide sélectionnée'};
+  probe.src=url;
+}
+R.sellerVideoNew=()=>{
+  const s=me();if(!s)return R.seller();
+  return `<div class="row"><h2>🎬 Publier une vidéo</h2>${backBtn}</div>
+  <div class="alert alert-warning">Prix : <b>${Rs(videoPrice())}</b> pour afficher votre vidéo sur la page d'accueil pendant <b>24 heures</b> (autoplay). Durée acceptée : de ${VIDEO_MIN_SEC}s à ${VIDEO_MAX_SEC}s (1 minute) maximum — au-delà, la vidéo est refusée. Fichier vidéo : max ${Math.round(VIDEO_MAX_BYTES/1024/1024)} Mo (choisissez une vidéo courte et légère, en basse résolution si besoin).</div>
+  <form onsubmit="submitVideo(event)">
+    <div class="form-group"><label>Choisissez votre vidéo</label><input type="file" accept="video/*" id="sv-file" required onchange="vidPicked(this)"></div>
+    <div id="sv-status" class="muted">Aucune vidéo sélectionnée</div>
+    <div class="form-group" style="margin-top:10px"><label>Numéro Juice de l'Admin</label><input readonly value="${esc(cfg().juice||'')}" style="background:var(--soft)"></div>
+    <div class="form-group"><label>Votre Numéro de Téléphone</label><input id="sv-phone" type="tel" value="${esc(s.id)}" required></div>
+    <div class="form-group"><label>Preuve de Paiement (Capture d'écran) — ${Rs(videoPrice())}</label><input type="file" id="sv-proof" accept="image/*" required></div>
+    <button id="sv-btn" class="btn btn-success" style="width:100%">Payer et envoyer pour validation</button>
+  </form>`;
+};
+async function submitVideo(e){
+  e.preventDefault();const s=me();if(!s)return;if(s.blocked)return toast('⛔ Compte bloqué');
+  if(!VID_FILE||!VID_DUR)return toast('Sélectionnez une vidéo valide ('+VIDEO_MIN_SEC+' à '+VIDEO_MAX_SEC+' secondes)');
+  const proofFile=$('#sv-proof').files[0];if(!proofFile)return toast('Ajoutez la preuve de paiement');
+  const btn=$('#sv-btn');btn.disabled=true;btn.textContent='Envoi en cours…';
+  try{
+    const vdata=await readFile(VID_FILE);
+    if(vdata.length>VIDEO_MAX_ENCODED)throw new Error('Vidéo trop volumineuse une fois envoyée ('+Math.round(vdata.length/1024/1024)+' Mo). Choisissez une vidéo plus courte/légère (max '+Math.round(VIDEO_MAX_BYTES/1024/1024)+' Mo) et réessayez.');
+    const proof=await photo(proofFile,800,.6),pid='vp'+uid();
+    await DB.set('vidblob/'+s.id,vdata);              /* le plus gros risque d'échec (limite 10 Mo) : on l'envoie et on l'attend en premier */
+    await DB.set('videos/'+s.id,{sellerId:s.id,durationSec:VID_DUR,status:'PENDING',ts:Date.now()});
+    await DB.set('videoPay/'+pid,{id:pid,sellerId:s.id,amount:videoPrice(),phone:$('#sv-phone').value,hasProof:true,status:'PENDING',ts:Date.now()});
+    await DB.set('proofs/'+pid,proof);
+    notify('admin','🎬 Paiement vidéo reçu',`${s.name} — ${Rs(videoPrice())} pour afficher une vidéo`);
+    VID_FILE=null;VID_DUR=null;
+    toast('✅ Envoyé à l\'admin pour validation');go('sellerVideoInfo');
+  }catch(err){
+    console.error(err);
+    DB.set('vidblob/'+s.id,null);DB.set('videos/'+s.id,null); /* on nettoie ce qui aurait pu être enregistré partiellement */
+    toast('❌ '+(err&&err.message?err.message:'Échec de l\'envoi de la vidéo'));
+    btn.disabled=false;btn.textContent='Payer et envoyer pour validation';
+  }
+}
+R.sellerVideoRenew=()=>{
+  const s=me();if(!s)return R.seller();const v=myVideo(s.id);if(!v)return R.sellerHome();
+  return `<div class="row"><h2>💳 Réafficher ma vidéo</h2>${backBtn}</div>
+  <p class="muted">Votre vidéo n'est plus affichée sur la page d'accueil (24 heures écoulées). Payez à nouveau ${Rs(videoPrice())} pour la réafficher pour 24 heures de plus. <b>Ce n'est pas obligatoire.</b></p>
+  <form onsubmit="submitVideoRenew(event)">
+    <div class="form-group"><label>Numéro Juice de l'Admin</label><input readonly value="${esc(cfg().juice||'')}" style="background:var(--soft)"></div>
+    <div class="form-group"><label>Votre Numéro de Téléphone</label><input id="svr-phone" type="tel" value="${esc(s.id)}" required></div>
+    <div class="form-group"><label>Preuve de Paiement (${Rs(videoPrice())})</label><input type="file" id="svr-proof" accept="image/*" required></div>
+    <button id="svr-btn" class="btn btn-success" style="width:100%">Payer pour réafficher</button>
+  </form>`;
+};
+async function submitVideoRenew(e){
+  e.preventDefault();const s=me();const v=myVideo(s&&s.id);if(!s||!v)return;
+  const proofFile=$('#svr-proof').files[0];if(!proofFile)return toast('Ajoutez la preuve de paiement');
+  const btn=$('#svr-btn');btn.disabled=true;btn.textContent='Envoi…';
+  try{
+    const proof=await photo(proofFile,800,.6),pid='vp'+uid();
+    DB.set('videoPay/'+pid,{id:pid,sellerId:s.id,amount:videoPrice(),phone:$('#svr-phone').value,hasProof:true,status:'PENDING',renew:true,ts:Date.now()});
+    DB.set('proofs/'+pid,proof);
+    DB.set('videos/'+s.id+'/status','PENDING');
+    notify('admin','🎬 Renouvellement vidéo',`${s.name} souhaite réafficher sa vidéo — ${Rs(videoPrice())}`);
+    toast('✅ Demande de renouvellement envoyée à l\'admin');go('sellerHome');
+  }catch(err){console.error(err);toast('Erreur : '+err.message);btn.disabled=false;btn.textContent='Payer pour réafficher'}
+}
+R.sellerVideoInfo=()=>`<div class="row"><h2>🎬 Comment ça marche</h2></div>
+<div class="card">
+ <p>✅ Votre paiement a été envoyé à l'administrateur pour validation.</p>
+ <p>📌 Une fois validée, votre vidéo <b>apparaît automatiquement sur la page d'accueil</b> et se lit toute seule (autoplay).</p>
+ <p>⏱️ Elle reste en ligne <b>24 heures</b>. Passé ce délai, elle disparaît de la page d'accueil.</p>
+ <p>🔁 Vous pourrez la réafficher en payant à nouveau ${Rs(videoPrice())} — ce n'est <b>pas obligatoire</b>.</p>
+ <p>📊 S'il y a plusieurs vidéos actives : la première publiée s'affiche en premier sur la page d'accueil, la 2e après 10 produits, la 3e après 20 produits, et ainsi de suite.</p>
+ <p>👁️ Le nombre de vues (remis à zéro chaque jour) est visible depuis votre espace vendeur.</p>
+ <p>🗑️ Vous pouvez supprimer votre vidéo à tout moment, même si elle a déjà été payée.</p>
+ <p>👉 En touchant votre vidéo, les clients sont dirigés vers votre boutique (vos produits).</p>
+</div>
+<button class="btn btn-primary" style="width:100%" onclick="go('sellerHome')">Retourner à mon espace vendeur</button>`;
+function deleteVideo(){
+  const s=me();if(!s||!myVideo(s.id))return;
+  if(!confirm('Supprimer votre vidéo boutique ? Cette action est définitive.'))return;
+  DB.set('videos/'+s.id,null);DB.set('vidblob/'+s.id,null);toast('✅ Vidéo supprimée');
+}
+
+/* --- Admin --- */
+R.adminLogin=()=>{
+  /* Ne jamais laisser l'Admin bloqué sur "Chargement...".
+     Si Firebase n'a pas encore répondu, le cache local peut être utilisé. */
+  const hasAdmin=Object.keys(admins()).length>0;
+  if(!hasAdmin && DB.fb && !DB.ready.admins && !DB.fbFailed){
+    return '<h2>Admin</h2><p class="muted">Connexion aux données Admin en cours…</p>';
+  }
+  if(!hasAdmin)return `<h2>Créer le compte Admin</h2><div class="alert alert-warning">Aucun admin n'existe encore. Ce compte sera le seul admin ; son numéro Juice recevra les commissions.</div>
+  <form onsubmit="adminRegister(event)"><div class="form-group"><label>Nom</label><input id="a-name" required></div>
+  <div class="form-group"><label>Numéro Juice (reçoit les commissions)</label><input id="a-juice" type="tel" required></div>
+  <div class="form-group"><label>Code secret (4 caractères min.)</label><input id="a-pin" type="password" minlength="4" required></div>
+  <button class="btn btn-success" style="width:100%">Créer mon espace admin</button></form>`;
+  return `<h2>Connexion Admin</h2><form onsubmit="adminLogin(event)"><div class="form-group"><label>Numéro Juice</label><input id="a-juice" type="tel" required></div>
+  <div class="form-group"><label>Code secret</label><input id="a-pin" type="password" required></div><button class="btn btn-primary" style="width:100%">Se connecter</button></form>`;
+};
+function adminRegister(e){
+  e.preventDefault();
+  if(Object.keys(admins()).length)return toast('Un admin existe déjà');
+  const id=norm($('#a-juice').value);
+  if(id.length<7)return toast('Numéro Juice invalide');
+  const name=$('#a-name').value.trim(), pin=H($('#a-pin').value);
+  const data={id,name,pin,ts:Date.now()};
+  DB.set('admins/'+id,data);
+  /* Connexion immédiate sans attendre le retour Firebase. */
+  LS.set('MB_ADM',id);
+  DB.S.admins[id]=data;
+  LS.set('MB_DB',DB.S);
+  toast('✅ Compte admin créé');
+  go('admin');
+}
+function adminLogin(e){
+  e.preventDefault();
+  const id=norm($('#a-juice').value), a=admins()[id];
+  if(!a||a.pin!==H($('#a-pin').value))return toast('Numéro ou code incorrect');
+  LS.set('MB_ADM',a.id);
+  toast('Bienvenue '+a.name);
+  askPushOnce();
+  go('admin');
+}
+function adminLogout(){LS.set('MB_ADM',null);go('home')}
+R.admin=()=>{
+  if(!isAdm())return R.adminLogin();
+  const os=DB.list('orders'),ap=os.filter(o=>o.status==='APPROVED'),sum=(l,st)=>l.filter(o=>o.commStatus===st).reduce((a,o)=>a+o.commission,0);
+  const paid=sum(os,'PAID'),owed=sum(os,'DUE')+sum(os,'PENDING'),pend=DB.list('commPay').filter(c=>c.status==='PENDING').sort((a,b)=>b.ts-a.ts),c=cfg();
+  const S=Object.values(sellers());
+  return `<div class="row"><h2>📊 Admin — ${esc(curAdm().name)}</h2><button class="btn btn-secondary btn-sm" onclick="adminLogout()">Déconnexion</button></div>
+  <div class="stats"><div class="stat" style="background:var(--green)"><b>${Rs(paid)}</b><span>Commissions encaissées</span></div>
+  <div class="stat" style="background:var(--red)"><b>${Rs(owed)}</b><span>Commissions dues</span></div>
+  <div class="stat" style="background:var(--blue)"><b>${ap.length}</b><span>Ventes validées</span></div>
+  <div class="stat" style="background:var(--navy)"><b>${Rs(ap.reduce((a,o)=>a+o.total,0))}</b><span>Volume d'affaires</span></div>
+  <div class="stat" style="background:var(--orange)"><b>${S.length}</b><span>Vendeurs</span></div>
+  <div class="stat" style="background:#7b5cff"><b>${DB.list('products').length}</b><span>Produits</span></div></div>
+  ${reportsHTML()}
+  <h3>Paiements de commission à valider (${pend.length})</h3>
+  ${pend.map(p=>`<div class="card"><div class="row"><b>${esc(sName(p.sellerId))}</b><b style="color:var(--green)">${Rs(p.amount)}</b></div><div class="muted">Juice ${esc(p.sellerId)} · Tél ${esc(p.phone)} · ${p.orderIds.length} vente(s)</div>
+    ${proofHTML(p.id,p.proof)}
+    <div class="row" style="margin-top:8px"><button class="btn btn-success" style="flex:1" onclick="commDecision('${p.id}',true)">✓ Valider</button><button class="btn btn-danger" style="flex:1" onclick="commDecision('${p.id}',false)">✕ Refuser</button></div></div>`).join('')||'<p class="muted">Aucun paiement en attente</p>'}
+  ${videoPendingHTML()}
+  <h3>Vendeurs</h3><button class="btn btn-secondary btn-sm" onclick="claimAll()">📩 Réclamer à tous les impayés</button> <button class="btn btn-danger btn-sm" onclick="blockUnpaid()">⛔ Bloquer tous les impayés</button>
+  ${S.map(s=>{const d=due(s.id).reduce((a,o)=>a+o.commission,0),n=os.filter(o=>o.sellerId===s.id&&o.status==='APPROVED').length;
+    return `<div class="card" style="margin-top:10px"><div><b>${esc(s.name)}</b> ${s.blocked?'<span class="pill" style="background:var(--red)">Bloqué</span>':''}<div class="muted">Juice ${esc(s.id)} · ${n} vente(s) · Dû : ${Rs(d)}</div></div>
+    <div class="row" style="margin-top:8px"><button class="btn btn-sm btn-primary" onclick="go('adminSeller','${s.id}')">Détails</button>${d>0?`<button class="btn btn-sm btn-secondary" onclick="claim('${s.id}')">📩 Réclamer</button>`:''}
+    <button class="btn btn-sm ${s.blocked?'btn-success':'btn-danger'}" onclick="blockSeller('${s.id}',${!s.blocked})">${s.blocked?'Débloquer':'Bloquer'}</button></div></div>`}).join('')||'<p class="muted">Aucun vendeur</p>'}
+  ${giftHTML()}
+  ${promoHTML()}
+  ${clientRewardsHTML()}
+  <h3>Paramètres</h3><div class="card"><div class="row"><span>Juice Admin (compte) : <b>${esc(c.juice)}</b></span><button class="btn btn-secondary btn-sm" onclick="setCfg('adminJuice')">Modifier</button></div>
+  <div class="row" style="margin-top:8px"><span>Lien de téléchargement de l'app</span><button class="btn btn-secondary btn-sm" onclick="setCfg('appLink')">Modifier</button></div>
+  <div class="muted" style="word-break:break-all">${esc(c.appLink||'non défini')}</div>
+  <div class="row" style="margin-top:8px"><span>Lien direct du fichier APK (bouton Télécharger)</span><button class="btn btn-secondary btn-sm" onclick="setCfg('apkLink')">Modifier</button></div>
+  <div class="muted" style="word-break:break-all">${esc(c.apkLink||'par défaut : fichier Moris_Baz_9.apk du site')}</div>
+  <div class="row" style="margin-top:8px"><span>Lien du site (partage produit)</span><button class="btn btn-secondary btn-sm" onclick="setCfg('siteLink')">Modifier</button></div>
+  <div class="muted" style="word-break:break-all">${esc(c.siteLink||'non défini — le partage se fera par texte uniquement')}</div>
+  <div class="row" style="margin-top:8px"><span>Lien du groupe WhatsApp (non-clients)</span><button class="btn btn-secondary btn-sm" onclick="setCfg('waGroupLink')">Modifier</button></div>
+  <div class="muted" style="word-break:break-all">${esc(c.waGroupLink||'non défini')}</div>
+  <div class="row" style="margin-top:8px"><span>Taux de commission : <b>${c.commRate}%</b></span><button class="btn btn-secondary btn-sm" onclick="setCfg('commRate')">Modifier</button></div>
+  <div class="row" style="margin-top:8px"><span>Commission maximale/vente : <b>${Rs(c.commMax)}</b></span><button class="btn btn-secondary btn-sm" onclick="setCfg('commMax')">Modifier</button></div>
+  <p class="muted" style="margin-top:6px">Exemple : vente de 50 Rs → ${Rs(commissionFor(50))} de commission. Vente de 1000 Rs ou plus → commission plafonnée à ${Rs(c.commMax)}.</p>
+  <div class="row" style="margin-top:8px"><span>Réduction promotion (% déduit) : <b>${getPromoDiscount()}%</b></span><button class="btn btn-secondary btn-sm" onclick="setCfg('promoDiscount')">Modifier</button></div>
+  <div class="muted" style="margin-top:6px">Quand le code PROMO est activé, ${getPromoDiscount()}% de réduction est appliqué au client et déduit de la commission du vendeur.</div>
+  <div class="row" style="margin-top:8px"><span>🎬 Prix vidéo boutique (24h) : <b>${Rs(videoPrice())}</b></span><button class="btn btn-secondary btn-sm" onclick="setCfg('videoPrice')">Modifier</button></div>
+  <div class="row" style="margin-top:8px"><span>Numéro Juice (reçoit les commissions)</span><button class="btn btn-secondary btn-sm" onclick="setCfg('adminJuice')">Modifier</button></div>
+  <div class="row" style="margin-top:8px"><span>Code admin</span><button class="btn btn-secondary btn-sm" onclick="setCfg('pin')">Changer</button></div>
+  <p class="muted" style="margin-top:6px">Les frais de livraison (postage) sont désormais fixés par chaque vendeur depuis son espace.</p></div>
+  <h3>Dernières commandes</h3>${os.sort((a,b)=>b.ts-a.ts).slice(0,10).map(o=>`<div class="card row"><div><b>#${o.id.slice(-6)}</b> ${esc(sName(o.sellerId))}<div class="muted">${new Date(o.ts).toLocaleString('fr-MU')}</div></div><div style="text-align:right">${Rs(o.total)}<br><span class="pill" style="background:${ST[o.status][1]}">${ST[o.status][0]}</span></div></div>`).join('')||'<p class="muted">Aucune commande</p>'}`;
+};
+R.adminSeller=id=>{
+  if(!isAdm())return R.adminLogin();
+  const s=sellers()[id];if(!s)return backBtn+'<p>Vendeur introuvable</p>';
+  const os=DB.list('orders').filter(o=>o.sellerId===id).sort((a,b)=>b.ts-a.ts),ap=os.filter(o=>o.status==='APPROVED'),
+   sum=st=>os.filter(o=>o.commStatus===st).reduce((a,o)=>a+(o.commission||0),0),
+   ps=DB.list('products').filter(p=>p.sellerId===id),pays=DB.list('commPay').filter(c=>c.sellerId===id).sort((a,b)=>b.ts-a.ts),d=sum('DUE');
+  return `${backBtn}<h2>${esc(s.name)} ${s.blocked?'<span class="pill" style="background:var(--red)">Bloqué</span>':''}</h2>
+  <div class="card"><div>📞 Juice : <b>${esc(id)}</b> · <a href="tel:+230${esc(id)}">Appeler</a></div><div class="muted">Inscrit le ${new Date(s.ts||0).toLocaleDateString('fr-MU')}</div>
+  <div style="margin-top:8px">${s.hasId?`<button class="btn btn-secondary btn-sm" onclick="showKyc('${id}',this)">🪪 Voir la pièce d'identité</button> <button class="btn btn-secondary btn-sm" onclick="requestIdResend('${id}')">🔄 Redemander la photo</button>`:'<span class="pill" style="background:var(--orange)">Pièce d\'identité non fournie</span>'}
+  ${(()=>{const n=DB.list('reports').filter(r=>r.sellerId===id).length;return n?` <span class="pill" style="background:var(--red)">🚩 ${n} signalement(s)</span>`:''})()}</div>
+  ${s.remindedAt?`<div class="muted">Dernière réclamation : ${new Date(s.remindedAt).toLocaleString('fr-MU')}</div>`:''}
+  ${(()=>{const v=myVideo(id);if(!v)return '';const live=videoIsLive(v);return `<div class="muted" style="margin-top:6px">🎬 Vidéo : ${live?'🔴 en ligne':videoExpired(v)?'expirée':v.status==='PENDING'?'en attente':v.status} · ${v.durationSec||'?'}s · 👁️ ${viewsToday(v)} vue(s) aujourd'hui</div>`})()}</div>
+  <div class="stats"><div class="stat" style="background:var(--blue)"><b>${ap.length}</b><span>Ventes validées</span></div>
+  <div class="stat" style="background:var(--navy)"><b>${Rs(ap.reduce((a,o)=>a+o.total,0))}</b><span>Volume d'affaires</span></div>
+  <div class="stat" style="background:var(--green)"><b>${Rs(sum('PAID'))}</b><span>Commission payée</span></div>
+  <div class="stat" style="background:var(--red)"><b>${Rs(d)}</b><span>Commission due</span></div>
+  <div class="stat" style="background:var(--orange)"><b>${Rs(sum('PENDING'))}</b><span>En vérification</span></div>
+  <div class="stat" style="background:#7b5cff"><b>${ps.length}</b><span>Produits</span></div></div>
+  <div class="row">${d>0?`<button class="btn btn-secondary" style="flex:1" onclick="claim('${id}')">📩 Réclamer ${Rs(d)}</button>`:''}
+  <button class="btn ${s.blocked?'btn-success':'btn-danger'}" style="flex:1" onclick="blockSeller('${id}',${!s.blocked})">${s.blocked?'Débloquer':'Bloquer'}</button></div>
+  <h3>Produits (${ps.length})</h3>${ps.map(p=>`<div class="card row"><div class="row" style="justify-content:flex-start"><div class="thumb">${img(p.image)}</div><div><b>${esc(p.name)}</b><div class="muted">${esc(p.category)}${p.sub?' › '+esc(p.sub):''}</div></div></div><b>${Rs(p.price)}</b></div>`).join('')||'<p class="muted">Aucun produit</p>'}
+  <h3>Commandes (${os.length})</h3>${os.map(o=>`<div class="card row"><div><b>#${o.id.slice(-6)}</b> · ${esc(o.buyerName||'Client')}<div class="muted">${new Date(o.ts).toLocaleString('fr-MU')} · Commission : ${CST[o.commStatus]||o.commStatus}</div></div><div style="text-align:right">${Rs(o.total)}<br><span class="pill" style="background:${ST[o.status][1]}">${ST[o.status][0]}</span></div></div>`).join('')||'<p class="muted">Aucune commande</p>'}
+  <h3>Paiements de commission</h3>${pays.map(c=>`<div class="card row"><div><b>${Rs(c.amount)}</b><div class="muted">${new Date(c.ts).toLocaleString('fr-MU')}</div></div><span class="pill" style="background:${ST[c.status][1]}">${ST[c.status][0]}</span></div>`).join('')||'<p class="muted">Aucun paiement</p>'}`;
+};
+function claim(id,quiet){
+  if(!isAdm())return;const d=due(id).reduce((a,o)=>a+o.commission,0);if(!d)return toast('Rien à réclamer');
+  DB.set('sellers/'+id+'/remindedAt',Date.now());
+  notify('s:'+id,'📩 Commission à payer',`L'admin vous réclame ${Rs(d)}. Payez pour éviter le blocage.`);if(!quiet)toast('📩 Réclamation envoyée');
+}
+function claimAll(){let n=0;Object.values(sellers()).forEach(s=>{if(due(s.id).length){claim(s.id,true);n++}});toast(n+' réclamation(s) envoyée(s)')}
+function commDecision(id,ok){
+  if(!isAdm())return;const p=DB.get('commPay')[id];if(!p)return;
+  DB.set('commPay/'+id+'/status',ok?'APPROVED':'REJECTED');
+  p.orderIds.forEach(o=>DB.set('orders/'+o+'/commStatus',ok?'PAID':'DUE'));
+  if(ok){const rest=due(p.sellerId).filter(o=>!p.orderIds.includes(o.id));if(!rest.length&&sellers()[p.sellerId]&&sellers()[p.sellerId].blocked)DB.set('sellers/'+p.sellerId+'/blocked',false)}
+  notify('s:'+p.sellerId,ok?'✅ Commission validée':'❌ Commission refusée',ok?`${Rs(p.amount)} reçus. Merci !`:'Preuve refusée, veuillez repayer.');
+}
+async function videoDecision(id,ok){
+  if(!isAdm())return;const p=DB.get('videoPay')[id];if(!p)return;
+  DB.set('videoPay/'+id+'/status',ok?'APPROVED':'REJECTED');
+  if(ok){
+    if(!DB.get('videos')[p.sellerId]){toast('⚠️ Le vendeur a supprimé sa vidéo entre-temps');return}
+    toast('Vérification de la vidéo…');
+    const blob=await DB.blob('vidblob/'+p.sellerId);
+    if(!blob){toast('⚠️ Vidéo introuvable ou non reçue — impossible de la publier. Demandez au vendeur de la renvoyer.');return}
+    DB.set('videos/'+p.sellerId+'/status','ACTIVE');DB.set('videos/'+p.sellerId+'/liveAt',Date.now());DB.set('videos/'+p.sellerId+'/payId',id);
+    notify('s:'+p.sellerId,'✅ Vidéo en ligne','Votre vidéo apparaît maintenant sur la page d\'accueil pour 24 heures.');
+  }else{
+    if(DB.get('videos')[p.sellerId])DB.set('videos/'+p.sellerId+'/status','REJECTED');
+    notify('s:'+p.sellerId,'❌ Paiement vidéo refusé','Preuve refusée, veuillez repayer et renvoyer une preuve.');
+  }
+  toast(ok?'✅ Vidéo validée':'❌ Paiement refusé');
+}
+async function showAdminVideo(sellerId,btn){
+  if(!isAdm())return;btn.disabled=true;btn.textContent='Chargement…';
+  const d=await DB.blob('vidblob/'+sellerId);
+  if(!d){btn.disabled=false;btn.textContent='🎬 Vidéo introuvable — réessayer';return}
+  btn.outerHTML=`<video src="${d}" controls playsinline style="width:100%;max-height:320px;border-radius:8px;margin-top:6px;background:#000"></video>`;
+}
+function videoPendingHTML(){
+  const pend=DB.list('videoPay').filter(p=>p.status==='PENDING').sort((a,b)=>b.ts-a.ts);
+  return `<h3>🎬 Paiements vidéo à valider (${pend.length})</h3>
+  ${pend.map(p=>{const v=DB.get('videos')[p.sellerId];return `<div class="card"><div class="row"><b>${esc(sName(p.sellerId))}</b><b style="color:var(--green)">${Rs(p.amount)}</b></div>
+  <div class="muted">Juice ${esc(p.sellerId)} · Tél ${esc(p.phone)} ${p.renew?'· Renouvellement':'· Nouvelle vidéo'}${v?' · Durée : '+v.durationSec+'s':''}</div>
+  <div class="muted" style="margin-top:6px">Preuve de paiement (${Rs(p.amount)}) :</div>${proofHTML(p.id,p.proof)}
+  <div class="muted" style="margin-top:8px">🎬 Vidéo à publier — à regarder avant de valider :</div><button class="btn btn-secondary btn-sm" onclick="showAdminVideo('${p.sellerId}',this)">▶️ Voir la vidéo</button>
+  <div class="row" style="margin-top:8px"><button class="btn btn-success" style="flex:1" onclick="videoDecision('${p.id}',true)">✓ Valider</button><button class="btn btn-danger" style="flex:1" onclick="videoDecision('${p.id}',false)">✕ Refuser</button></div></div>`}).join('')||'<p class="muted">Aucun paiement vidéo en attente</p>'}`;
+}
+function blockSeller(id,b){if(!isAdm())return;DB.set('sellers/'+id+'/blocked',b);notify('s:'+id,b?'⛔ Compte bloqué':'✅ Compte débloqué',b?'Payez votre commission pour être débloqué.':'Vous pouvez de nouveau vendre.')}
+function requestIdResend(id){
+  if(!isAdm())return;const s=sellers()[id];if(!s)return;
+  if(!confirm('Demander à '+s.name+' de renvoyer une nouvelle photo de sa carte d\'identité ?'))return;
+  DB.set('sellers/'+id+'/hasId',false);
+  notify('s:'+id,'🪪 Nouvelle photo demandée','L\'administrateur vous demande de renvoyer une photo claire de votre carte d\'identité.');
+  toast('✅ Demande envoyée au vendeur');
+}
+function blockUnpaid(){if(!isAdm())return;let n=0;Object.values(sellers()).forEach(s=>{if(!s.blocked&&due(s.id).length){blockSeller(s.id,true);n++}});toast(n+' vendeur(s) bloqué(s)')}
+function setCfg(k){
+  if(!isAdm())return;
+  if(k==='adminJuice'){
+    const v=prompt('Nouveau numéro Juice (recevra les commissions)',curAdm().id);if(v===null)return;
+    const id=norm(v);if(id.length<7)return toast('Numéro Juice invalide');
+    if(id===curAdm().id)return;
+    if(admins()[id])return toast('Ce numéro est déjà utilisé par un compte admin');
+    const a=curAdm();DB.set('admins/'+id,Object.assign({},a,{id}));DB.set('admins/'+a.id,null);
+    LS.set('MB_ADM',id);toast('✅ Numéro Juice mis à jour');go('admin');return;
+  }
+  if(k==='appLink'){const v=prompt('Lien de téléchargement de l\'application (URL)',cfg().appLink||'');if(v===null)return;DB.set('settings/appLink',v.trim());return toast('✅ Enregistré')}
+  if(k==='apkLink'){const v=prompt('Lien direct du fichier APK (laisser vide = fichier Moris_Baz_9.apk hébergé avec le site)',cfg().apkLink||'');if(v===null)return;DB.set('settings/apkLink',v.trim());return toast('✅ Enregistré')}
+  if(k==='siteLink'){const v=prompt('Lien du site hébergé (ex. https://moris-baz.web.app)',cfg().siteLink||'');if(v===null)return;DB.set('settings/siteLink',v.trim());return toast('✅ Enregistré')}
+  if(k==='waGroupLink'){const v=prompt('Lien du groupe WhatsApp (pour les non-clients)',cfg().waGroupLink||'');if(v===null)return;DB.set('settings/waGroupLink',v.trim());return toast('✅ Enregistré')}
+  if(k==='commRate'){const v=prompt('Taux de commission (%) appliqué au montant de chaque vente',cfg().commRate);if(v===null)return;
+    const n=parseFloat(v);if(isNaN(n)||n<0||n>100)return toast('Valeur invalide (0 à 100)');DB.set('settings/commRate',n);return toast('✅ Enregistré')}
+  if(k==='commMax'){const v=prompt('Commission maximale (Rs) par vente, quel que soit le montant',cfg().commMax);if(v===null)return;
+    const n=parseFloat(v);if(isNaN(n)||n<0)return toast('Valeur invalide');DB.set('settings/commMax',n);return toast('✅ Enregistré')}
+  if(k==='promoDiscount'){const v=prompt('Pourcentage de réduction promotion (%) déduit de la commission vendeur',cfg().promoDiscount||5);if(v===null)return;
+    const n=parseFloat(v);if(isNaN(n)||n<0||n>100)return toast('Valeur invalide (0 à 100)');DB.set('settings/promoDiscount',n);return toast('✅ Enregistré')}
+  if(k==='videoPrice'){const v=prompt('Prix (Rs) pour afficher une vidéo boutique 24h sur la page d\'accueil',videoPrice());if(v===null)return;
+    const n=parseFloat(v);if(isNaN(n)||n<0)return toast('Valeur invalide');DB.set('settings/videoPrice',n);return toast('✅ Enregistré')}
+  const labels={pin:'Nouveau code admin'};
+  const v=prompt(labels[k]);if(v===null||v.trim()==='')return;
+  if(k==='pin'){if(v.length<4)return toast('4 caractères minimum');DB.set('admins/'+curAdm().id+'/pin',H(v))}
+  else{const n=parseFloat(v);if(isNaN(n)||n<0)return toast('Valeur invalide');DB.set('settings/'+k,n)}
+  toast('✅ Enregistré');
+}
+
+/* --- Menu --- */
+function openMenu(){
+  const u=unread();
+  const rb=myReward('c:'+cid);
+  $('#menu-body').innerHTML=[['🏠 Accueil',"go('home')"],['🗂️ Catégories',"go('categories')"],[`❤️ Favoris (${favs().size})`,"go('favs')"],['📦 Mes commandes',"go('myorders')"],
+    [`🔔 Notifications${u?' ('+u+')':''}`,"go('notifs')"],['📲 Activer les notifications','askPush()'],['📤 Partager l\'application',"shareApp('client')"],...(isWeb()?[['📲 Télécharger l\'application (APK)','downloadApp()']]:[]),[`🎁 Parrainage${rb?' — '+Rs(rb):''}`,"go('referral')"],['🔗 J\'ai un code produit','useProductCode()'],...(cfg().giftActive?[['🎁 J\'ai un code cadeau','useGiftCode()']]:[]),['👤 Espace vendeur',"go('seller')"],...(isAdm()?[['📊 Admin',"go('admin')"]]:[])]
+    .map(([t,f])=>`<button class="menu-item" onclick="${f};closeMenu()">${t}</button>`).join('');
+  $('#menu-modal').classList.add('active');
+}
+/* Téléchargement direct de l'APK (le fichier Moris_Baz_9.apk doit être placé à côté du fichier HTML sur le site) */
+const APK_FILE='Moris_Baz_9.apk';
+const isWeb=()=>/^https?:$/.test(location.protocol);
+async function downloadApp(){
+  const ext=(cfg().apkLink||'').trim();
+  const urls=[...(ext?[ext]:[]),APK_FILE];
+  toast('⬇️ Préparation du téléchargement…');
+  for(const u of urls){
+    try{
+      const r=await fetch(u,{cache:'no-cache'});
+      const ct=(r.headers.get('content-type')||'').toLowerCase();
+      if(!r.ok||ct.includes('text/html'))throw new Error('introuvable');
+      const b=await r.blob();
+      if(b.size<100000)throw new Error('fichier invalide');
+      const url=URL.createObjectURL(new Blob([b],{type:'application/vnd.android.package-archive'}));
+      const a=document.createElement('a');a.href=url;a.download=APK_FILE;a.style.display='none';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+      return toast('✅ Téléchargement lancé — ouvrez le fichier pour installer l\'application');
+    }catch(e){console.warn('APK',u,e)}
+  }
+  if(ext){window.open(ext,'_blank');return toast('Ouverture du lien de téléchargement…')}
+  toast('❌ Fichier de l\'application introuvable sur le site. Contactez l\'administrateur.');
+}
+function closeMenu(){$('#menu-modal').classList.remove('active')}
+
+/* ========= Signalements & adresse ========= */
+const DISTRICTS=['Port Louis','Pamplemousses','Rivière du Rempart','Flacq','Grand Port','Savanne','Plaines Wilhems','Moka','Black River','Rodrigues'];
+const RS={product:['Description ou photo trompeuse','Produit interdit ou illégal','Contrefaçon','Prix abusif','Autre'],
+  seller:['Arnaque / fraude','Ne livre pas la commande','Comportement inapproprié','Fausse identité','Autre']};
+const addrLine=o=>o.address?`<div class="muted">📍 ${esc(o.address.street)}, ${esc(o.address.district)}${o.address.note?' ('+esc(o.address.note)+')':''}</div>`:'';
+let RP=null;
+function openReport(type,tid){
+  const p=type==='product'?DB.get('products')[tid]:null,sid=type==='product'?(p&&p.sellerId):tid;if(!sid)return;
+  if(DB.list('reports').some(r=>r.clientId===cid&&r.type===type&&r.targetId===tid&&r.status==='OPEN'))return toast('Vous avez déjà signalé cet élément');
+  RP={type,tid,sid};$('#rp-title').textContent=type==='product'?'🚩 Signaler ce produit':'🚩 Signaler ce vendeur';
+  $('#rp-reason').innerHTML='<option value="">Choisir un motif</option>'+RS[type].map(x=>`<option>${x}</option>`).join('');
+  $('#rp-details').value='';$('#report-modal').classList.add('active');
+}
+function sendReport(e){
+  e.preventDefault();if(!RP)return;const id='r'+uid();
+  DB.set('reports/'+id,{id,type:RP.type,targetId:RP.tid,sellerId:RP.sid,reason:$('#rp-reason').value,details:$('#rp-details').value.trim(),clientId:cid,name:LS.get('MB_NAME','Client'),status:'OPEN',ts:Date.now()});
+  notify('admin','🚩 Nouveau signalement',(RP.type==='product'?'Produit':'Vendeur')+' — '+sName(RP.sid));
+  RP=null;closeModal('report-modal');toast('✅ Signalement envoyé à l\'administrateur');
+}
+function reportsHTML(){
+  const all=DB.list('reports'),rs=all.filter(r=>r.status==='OPEN').sort((a,b)=>b.ts-a.ts);
+  return `<h3>🚩 Signalements (${rs.length})</h3>`+(rs.map(r=>{
+    const p=r.type==='product'?DB.get('products')[r.targetId]:null,n=all.filter(x=>x.type===r.type&&x.targetId===r.targetId).length;
+    return `<div class="card"><div class="row"><b>${esc(r.type==='product'?'Produit : '+(p?p.name:'(supprimé)'):'Vendeur : '+sName(r.sellerId))}</b><span class="pill" style="background:var(--red)">${n} signalement(s)</span></div>
+    <div class="muted">Vendeur : ${esc(sName(r.sellerId))} · Juice ${esc(r.sellerId)}</div><div><b>${esc(r.reason)}</b></div>${r.details?`<div>${esc(r.details)}</div>`:''}
+    <div class="muted">Par ${esc(r.name)} · ${new Date(r.ts).toLocaleString('fr-MU')}</div>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="go('adminSeller','${r.sellerId}')">Voir vendeur</button>
+    ${p?`<button class="btn btn-sm btn-danger" onclick="adminDelProduct('${p.id}')">Supprimer produit</button>`:''}
+    <button class="btn btn-sm btn-danger" onclick="blockSeller('${r.sellerId}',true)">Bloquer vendeur</button>
+    <button class="btn btn-sm btn-success" onclick="reportDone('${r.id}')">✓ Traité</button></div></div>`}).join('')||'<p class="muted">Aucun signalement</p>');
+}
+function reportDone(id){if(isAdm())DB.set('reports/'+id+'/status','DONE')}
+function giftHTML(){
+  const on=!!cfg().giftActive,list=giftEligible();
+  return `<h3>🎁 Cadeaux gratuits</h3>
+  <div class="card"><div class="row"><span>Message sur la page d'accueil</span><button class="btn btn-sm ${on?'btn-success':'btn-secondary'}" onclick="toggleGiftProgram()">${on?'✅ Activé':'Désactivé'}</button></div>
+  <p class="muted" style="margin-top:6px">Code unique : <b>${GIFT_CODE}</b>. Quand c'est activé, un message invite les clients à utiliser ce code sur la page d'accueil. Un produit s'affiche dans le catalogue cadeaux uniquement si son prix est inférieur ou égal à la commission due par son vendeur.</p></div>
+  <h4>Produits actuellement offerts (${list.length})</h4>${list.map(p=>`<div class="card row"><div><b>${esc(p.name)}</b> — ${esc(sName(p.sellerId))}<div class="muted">${Rs(p.price)} · commission due : ${Rs(commDue(p.sellerId))}</div></div></div>`).join('')||'<p class="muted">Aucun produit éligible pour le moment</p>'}`;
+}
+function clientRewardsHTML(){
+  const rw=DB.get('rewards'),cls=DB.get('clients');
+  const rows=Object.keys(rw).filter(k=>k.startsWith('c:')&&rw[k].balance>0).map(k=>{const id=k.slice(2),cl=cls[id]||{};return{id,phone:cl.phone,bal:rw[k].balance}});
+  if(!rows.length)return'';
+  return `<h3>🎁 Parrainages clients à payer (${rows.length})</h3>${rows.map(r=>`<div class="card row"><div><b>Client</b><div class="muted">Code ${esc(r.id)}${r.phone?' · Tél '+esc(r.phone):' · Numéro non fourni'}</div></div>
+    <div style="text-align:right"><b style="color:var(--green)">${Rs(r.bal)}</b><br><button class="btn btn-success btn-sm" onclick="payoutReferral('${r.id}')">✓ Marqué payé</button></div></div>`).join('')}`;
+}
+function payoutReferral(cid2){
+  if(!isAdm())return;const bal=myReward('c:'+cid2);if(bal<=0)return;
+  useReward('c:'+cid2,bal,'Payé par l\'admin (Juice)');
+  notify('c:'+cid2,'💸 Récompense payée',`${Rs(bal)} vous ont été envoyés par l'admin.`);toast('✅ Marqué comme payé');
+}
+function adminDelProduct(id){if(!isAdm()||!confirm('Supprimer ce produit ?'))return;
+  DB.set('products/'+id,null);DB.set('pimg/'+id,null);DB.set('ratings/'+id,null);
+  DB.list('reports').filter(r=>r.targetId===id).forEach(r=>DB.set('reports/'+r.id+'/status','DONE'));toast('Produit supprimé')}
+
+/* ========= Démarrage ========= */
+let rT;
+DB.cbs.push(c=>{
+  if(c==='notifs')pushNew();
+  clearTimeout(rT);rT=setTimeout(()=>{      /* regroupe les mises à jour : 1 seul rendu */
+    const busy=document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    if((LIVE.includes(view)||view==='adminLogin')&&!busy&&!(view==='seller'&&!me()))render();
+    badges();
+  },60);
+});
+/* ========= AdMob (bannière native, uniquement dans l'app mobile) ========= */
+const ADMOB_APP_ID='ca-app-pub-7087290056091576~9295373760';
+const ADMOB_BANNER_ID='ca-app-pub-7087290056091576/6480499001';
+const ADMOB_TEST_DEVICE='f6fddf3e-4b98-4f2e-9f24-10ca1ad1abe1';
+async function initAdMob(){
+  try{
+    /* Nécessite un wrapper natif (ex. Capacitor + plugin @capacitor-community/admob).
+       Dans un simple navigateur/PWA, ce plugin n'existe pas : on ne fait rien (pas d'erreur). */
+    const C=window.Capacitor;
+    if(!C||!C.Plugins||!C.Plugins.AdMob)return;
+    const {AdMob}=C.Plugins;
+    await AdMob.initialize({appId:ADMOB_APP_ID,testingDevices:[ADMOB_TEST_DEVICE],initializeForTesting:false});
+    await AdMob.showBanner({adId:ADMOB_BANNER_ID,adSize:'BANNER',position:'BOTTOM_CENTER',margin:0,isTesting:false});
+    document.body.classList.add('has-admob-banner');
+  }catch(e){console.warn('AdMob indisponible',e)}
+}
+
+/* ========= Bouton retour du téléphone → toujours vers la page d'accueil ========= */
+function setupHardwareBack(){
+  try{
+    history.pushState({mb:1},'','');
+    window.addEventListener('popstate',()=>{
+      history.pushState({mb:1},''); /* on garde toujours un état pour intercepter le prochain retour */
+      if(view!=='home')go('home');
+    });
+  }catch(e){}
+}
+
+/* Rafraîchit l'affichage périodiquement pour refléter l'expiration (24h) des vidéos boutique sans attendre un autre événement */
+setInterval(()=>{if(['home','sellerHome','admin'].includes(view))render()},60000);
+
+window.addEventListener('DOMContentLoaded',()=>{DB.init();render();badges();pushNew();checkDeepLink();initAdMob();setupHardwareBack()});
+</script>
+</body>
+</html>
